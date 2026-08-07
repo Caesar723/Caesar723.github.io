@@ -250,7 +250,7 @@ export const projects = [
           }
         ]
       },
-      { title: "Results", paragraphs: ["The improved AI achieved over a 90% win rate against previous AI versions. This result is a comparison with earlier versions of the project's own AI, separate from the TensorBoard success-rate curve shown for a training run."] },
+      { title: "Results", paragraphs: ["The improved AI achieved over a 60% win rate against previous strong AI versions. This result is a comparison with earlier versions of the project's own AI, separate from the TensorBoard success-rate curve shown for a training run."] },
       { title: "My Contribution", paragraphs: ["This is part of my personal project. I designed the state encoding, action-space mapping, reward function, reward debugging visualization, and PPO integration, then connected the trained agent to the real Magic Fan Made battle environment."] }
     ]
   },
@@ -902,7 +902,7 @@ const chineseProjectText = [
           }
         ]
       },
-      { title: "结果", paragraphs: ["改进后的 AI 相比项目旧版本 AI 达到了超过 90% 的胜率。这个结果是与项目内部早期 AI 版本的对比，和页面上展示的单次训练 success_rate 曲线分开理解。"] },
+      { title: "结果", paragraphs: ["改进后的 AI 相比项目历史强 AI 达到了超过 60% 的胜率。这个结果是与项目内部早期 AI 版本的对比，和页面上展示的单次训练 success_rate 曲线分开理解。"] },
       { title: "我的贡献", paragraphs: ["这是我的个人项目的一部分。我设计了状态编码、动作空间映射、reward 函数、reward 调试可视化和 PPO 集成，并把训练后的 agent 接入真实的 Magic Fan Made 战斗环境。"] }
     ]
   },
