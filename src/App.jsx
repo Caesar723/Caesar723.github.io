@@ -328,20 +328,57 @@ function ProjectMediaGallery({ gallery, ui }) {
   );
 }
 
-function ProjectSectionMedia({ items }) {
+function ProjectSectionMediaItem({ item, ui }) {
+  const [hasMediaError, setHasMediaError] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const videoRef = useRef(null);
+  const mediaSrc = item.src ? assetUrl(item.src) : "";
+  const posterSrc = item.poster ? assetUrl(item.poster) : "";
+  const isImage = item.kind === "image" || item.type?.startsWith("image/");
+  const shouldRenderMedia = mediaSrc && !hasMediaError;
+
+  return (
+    <figure className="section-media">
+      <div className={`section-media__frame${isImage ? "" : " section-media__frame--video"}`}>
+        {shouldRenderMedia && isImage ? (
+          <img src={mediaSrc} alt={item.alt || item.title} loading="lazy" onError={() => setHasMediaError(true)} />
+        ) : shouldRenderMedia ? (
+          <video
+            ref={videoRef}
+            controls
+            muted
+            playsInline
+            preload="metadata"
+            poster={posterSrc || undefined}
+            onError={() => setHasMediaError(true)}
+            onPlay={() => setIsPlaying(true)}
+            onPause={() => setIsPlaying(false)}
+            onEnded={() => setIsPlaying(false)}
+          >
+            <source src={mediaSrc} type={item.type || "video/mp4"} />
+          </video>
+        ) : (
+          <div className="section-media__placeholder">{ui.videoUnavailable}</div>
+        )}
+        {shouldRenderMedia && !isImage && !isPlaying ? (
+          <button type="button" className="section-media__play" aria-label={`${ui.playVideo}: ${item.title}`} onClick={() => void videoRef.current?.play()}>
+            <span aria-hidden="true">▶</span>
+            <span>{ui.playVideo}</span>
+          </button>
+        ) : null}
+      </div>
+      <figcaption>
+        <strong>{item.title}</strong>
+        <span>{item.description}</span>
+      </figcaption>
+    </figure>
+  );
+}
+
+function ProjectSectionMedia({ items, ui }) {
   return (
     <div className="section-media-list">
-      {items.map((item) => (
-        <figure className="section-media" key={item.id}>
-          <div className="section-media__frame">
-            <img src={assetUrl(item.src)} alt={item.alt || item.title} loading="lazy" />
-          </div>
-          <figcaption>
-            <strong>{item.title}</strong>
-            <span>{item.description}</span>
-          </figcaption>
-        </figure>
-      ))}
+      {items.map((item) => <ProjectSectionMediaItem item={item} key={item.id} ui={ui} />)}
     </div>
   );
 }
@@ -371,14 +408,14 @@ function ProjectDetail({ content }) {
         <ProjectLinks links={project.links} ui={content.ui} />
       </header>
 
-      {project.mediaGallery ? (
+      {project.mediaGallery && !project.inlineMedia ? (
         <ProjectMediaGallery gallery={project.mediaGallery} ui={content.ui} />
-      ) : (
+      ) : !project.inlineMedia ? (
         <div className="project-cover-placeholder" role="img" aria-label={project.mediaLabel + content.ui.projectCoverSuffix}>
           <span>{project.mediaLabel}</span>
           <strong>{project.mediaDetail}</strong>
         </div>
-      )}
+      ) : null}
 
       <div className="project-body">
         {project.sections.map((section) => (
@@ -390,7 +427,7 @@ function ProjectDetail({ content }) {
                 {section.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
               </ul>
             ) : null}
-            {section.media?.length ? <ProjectSectionMedia items={section.media} /> : null}
+            {section.media?.length ? <ProjectSectionMedia items={section.media} ui={content.ui} /> : null}
           </section>
         ))}
       </div>

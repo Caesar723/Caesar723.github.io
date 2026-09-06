@@ -343,77 +343,153 @@ export const projects = [
   },
   {
     slug: "finetune-2d-point-detection-model",
-    title: "Fine-tuning a 2D Point Detection Model",
+    title: "Video-based 3D Human Pose Estimation",
     period: "Jun. 2026 - Present",
     role: "AI Programmer Intern",
     status: "MuteGravity internship project · ongoing",
-    mediaLabel: "2D Point Detection",
-    mediaDetail: "Trainable model reconstruction · UE synthetic-data pipeline",
+    mediaLabel: "Video-based 3D Pose Estimation",
+    mediaDetail: "Synthetic data · 2D keypoints · image-aware 3D reconstruction",
+    inlineMedia: true,
     thumbnail: {
-      src: "images/project-thumbnails/finetune-2d-point-detection.jpg",
-      alt: "2D point detection fine-tuning and Unreal Engine data pipeline thumbnail."
+      src: "images/project-thumbnails/finetune-2d-point-detection.png",
+      alt: "Video-based 3D human pose estimation and Unreal Engine synthetic-data pipeline thumbnail."
     },
-    summary: "A SimCC-based 2D point-detection fine-tuning project where I parsed a provided .pth prediction model, reconstructed a trainable version, and built a UE rendering pipeline for supervised data generation.",
-    description: "Built during an AI programmer internship at MuteGravity, the project combined SimCC model reconstruction, loss-function design, and Unreal Engine synthetic-data generation to make an existing prediction-only checkpoint trainable and verifiable.",
-    technologies: ["Python", "PyTorch", "SimCC", "Unreal Engine", "Style3D", "MotionBuilder", "BVH", "FBX", "Animation Retargeting", "XRFeitoria", "Soft Cross Entropy", "Student-t Soft Targets", "Wasserstein1DLoss"],
-    links: [{ label: "XRFeitoria", href: "https://github.com/openxrlab/xrfeitoria" }],
+    summary: "From 2D Keypoint Prediction and Image Features to 3D Pose Reconstruction — a two-stage video-based 3D human pose estimation pipeline spanning MetaHuman synthetic-data production, SimCC-based 2D keypoint fine-tuning, and image-aware reconstruction with a modified MixSTE model.",
+    description: "Built during an AI programmer internship at MuteGravity, this project turns rendered MetaHuman video into aligned 2D and 3D supervision, then combines 2D joint tokens with pretrained ViT image features to reconstruct 3D pose from video.",
+    technologies: ["Python", "PyTorch", "Unreal Engine", "MetaHuman", "Style3D", "MotionBuilder", "BVH", "FBX", "Animation Retargeting", "XRFeitoria", "SimCC", "Vision Transformer (ViT)", "MixSTE", "Cross-Attention", "3D Human Pose Estimation", "Wine", "Linux", "Virtual Display", "Containerised Deployment", "Soft Cross Entropy", "Student-t Soft Targets", "Wasserstein1DLoss"],
+    links: [
+      { label: "XRFeitoria", href: "https://github.com/openxrlab/xrfeitoria" },
+      { label: "MixSTE", href: "https://github.com/JinluZhang1126/MixSTE" }
+    ],
     mediaGallery: {
-      title: "Pipeline Overview",
-      intro: "A temporary visual summary of the project: model reconstruction, loss design, and the BVH-to-FBX-to-Unreal rendering data pipeline.",
+      title: "Pipeline Evidence and Results",
+      intro: "The cover image and four project recordings show the aligned rendering labels, 2D fine-tuning comparison, image-aware 3D reconstruction, and Linux containerised rendering service.",
       items: [
         {
-          id: "finetune-2d-point-detection-pipeline",
-          title: "2D Point Detection Pipeline",
-          description: "Temporary project thumbnail showing the synthetic-data and fine-tuning workflow.",
-          src: "images/project-thumbnails/finetune-2d-point-detection.jpg",
-          alt: "A visual summary of the 2D point detection fine-tuning pipeline.",
+          id: "video-based-3d-pose-cover",
+          title: "Two-Stage Pipeline",
+          description: "A visual overview of the synthetic-data, 2D keypoint, and 3D reconstruction workflow.",
+          src: "images/project-thumbnails/finetune-2d-point-detection.png",
+          alt: "Visual overview of the video-based 3D human pose estimation pipeline.",
           kind: "image"
+        },
+        {
+          id: "rendered-2d-keypoint-projection",
+          title: "Aligned Rendered 2D Keypoints",
+          description: "2D keypoints projected from MetaHuman 3D data after fixing the frame and label synchronisation delay.",
+          src: "videos/video-based-3d-human-pose-estimation/rendered-2d-keypoint-projection.mp4",
+          poster: "videos/video-based-3d-human-pose-estimation/rendered-2d-keypoint-projection.jpg",
+          type: "video/mp4"
+        },
+        {
+          id: "finetuned-2d-keypoint-comparison",
+          title: "Fine-tuned 2D Keypoint Comparison",
+          description: "A representative comparison of the source video, original prediction, fine-tuned prediction, and their overlay. The base model was already strong, so the visual difference is subtle.",
+          src: "videos/video-based-3d-human-pose-estimation/finetuned-2d-keypoint-comparison.mp4",
+          poster: "videos/video-based-3d-human-pose-estimation/finetuned-2d-keypoint-comparison.jpg",
+          type: "video/mp4"
+        },
+        {
+          id: "image-aware-3d-pose-reconstruction",
+          title: "Image-aware 2D-to-3D Pose Reconstruction",
+          description: "A 3D pose prediction produced by the model trained from scratch with both 2D joints and image features.",
+          src: "videos/video-based-3d-human-pose-estimation/image-aware-3d-pose-reconstruction.mp4",
+          poster: "videos/video-based-3d-human-pose-estimation/image-aware-3d-pose-reconstruction.jpg",
+          type: "video/mp4"
+        },
+        {
+          id: "linux-container-rendering-service",
+          title: "Linux Container Rendering Service",
+          description: "A browser-based monitoring view of Unreal Engine rendering in the reusable Linux container. The UI is optional and is removed for production rendering.",
+          src: "videos/video-based-3d-human-pose-estimation/linux-container-rendering-service.mp4",
+          poster: "videos/video-based-3d-human-pose-estimation/linux-container-rendering-service.jpg",
+          type: "video/mp4"
         }
       ]
     },
     sections: [
-      { title: "Project Overview", paragraphs: ["This is an ongoing MuteGravity internship project from June 2026. I worked on it as an AI Programmer Intern.", "I received a prediction model as a .pth checkpoint. The model used SimCC-style coordinate classification for 2D point detection. The core task was to parse the checkpoint, reverse-engineer it into a trainable model structure, and verify that the reconstructed trainable model matched the original prediction model.", "After reconstructing the model, I designed the fine-tuning objective and connected it to a synthetic-data pipeline generated through Unreal Engine rendering."] },
       {
-        title: "Model Reconstruction and Verification",
-        paragraphs: ["The first technical challenge was turning a prediction-only checkpoint into a model that could be trained again."],
+        title: "Project Overview",
+        paragraphs: ["This ongoing MuteGravity internship project is a two-stage video-based 3D human pose estimation pipeline. Fine-tuning the 2D keypoint detector is the first stage; image-aware 3D reconstruction is the second.", "The workflow produces controllable MetaHuman video and aligned annotations in Unreal Engine, fine-tunes a 2D keypoint predictor on the generated data, and reconstructs 3D pose by combining 2D joint predictions with pretrained image features."],
+        media: [{
+          id: "video-based-3d-pose-cover",
+          title: "Two-Stage Pipeline",
+          description: "A visual overview of the synthetic-data, 2D keypoint, and 3D reconstruction workflow.",
+          src: "images/project-thumbnails/finetune-2d-point-detection.png",
+          alt: "Visual overview of the video-based 3D human pose estimation pipeline.",
+          kind: "image"
+        }]
+      },
+      {
+        title: "MetaHuman Data Production",
+        paragraphs: ["I built the Unreal Engine rendering workflow that produces the supervision required by both model stages. Motion assets are retargeted to MetaHuman characters and then cleaned to reduce visible hand-to-body and other mesh intersections before rendering."],
         bullets: [
-          "Parsed the provided .pth model to understand the layer structure and parameter layout.",
-          "Reconstructed a trainable PyTorch model compatible with the checkpoint and its SimCC output format.",
-          "Validated correctness by comparing the reconstructed trainable model against the original prediction model."
+          "Converted BVH motion files to FBX and used MotionBuilder for animation retargeting.",
+          "Generated rendering configurations for animation, character and scene placement, clothing, Style3D-related setup, camera trajectory, and camera rotation.",
+          "Used Python and XRFeitoria to run Unreal Engine rendering continuously, recover after crashes, and resume from existing progress.",
+          "Collected rendered frames, camera information, MetaHuman 3D point data, skel-hit data, and projected 2D keypoints."
         ]
       },
       {
-        title: "Loss Design",
-        paragraphs: ["The model used SimCC, representing each 2D point through 1D coordinate distributions. The loss design used distribution-aware supervision so the model could learn from soft coordinate targets rather than only hard labels."],
-        bullets: [
-          "Soft Cross Entropy was applied to Student's t-distribution soft targets for robust coordinate-distribution supervision.",
-          "Wasserstein1DLoss to constrain the 1D distribution distance of predicted point locations."
-        ]
+        title: "Frame-Level Label Synchronisation",
+        paragraphs: ["The initial collection flow had a major alignment bug: 3D point data was delayed relative to the video, but not by a fixed number of frames. The cause was a timing mismatch: 3D points were collected on Unreal Engine ticks, while video frames were written on rendered frames.", "I changed the collection logic so that the matching 3D point data is saved immediately after each rendered frame. This aligns the rendered frame, its 3D pose, and its 2D camera projection at the same point in the render loop. The recording below shows the resulting high-accuracy 2D labels."],
+        media: [{
+          id: "rendered-2d-keypoint-projection",
+          title: "Aligned Rendered 2D Keypoints",
+          description: "2D keypoints projected from MetaHuman 3D data after fixing the frame and label synchronisation delay.",
+          src: "videos/video-based-3d-human-pose-estimation/rendered-2d-keypoint-projection.mp4",
+          poster: "videos/video-based-3d-human-pose-estimation/rendered-2d-keypoint-projection.jpg",
+          type: "video/mp4"
+        }]
       },
       {
-        title: "UE Rendering Data Pipeline",
-        paragraphs: ["The data-generation pipeline was built around Unreal Engine rendering and was divided into three main stages."],
+        title: "2D Keypoint Model Reconstruction and Fine-tuning",
+        paragraphs: ["I received a prediction-only .pth checkpoint using SimCC-style coordinate classification. I parsed its layer and parameter structure, reconstructed a compatible trainable PyTorch model, and verified that the reconstructed model matched the original prediction behaviour.", "The original model was already strong, so fine-tuning produced only subtle visible changes. Its value was to adapt the detector to the rendered data distribution and make it a reliable 2D input stage for 3D reconstruction."],
         bullets: [
-          "Stage 1: convert BVH motion files into FBX files. This used MotionBuilder for animation retargeting, with animation cleanup to reduce body or clothing penetration.",
-          "Stage 2: generate configuration files. Each rendered video corresponds to a batch of configs describing the FBX animation, map and character placement, clothing, Style3D-related rendering setup, camera trajectory, and camera rotation.",
-          "Stage 3: render videos by running Python scripts that operate Unreal Engine through XRFeitoria. The rendering workflow also used Style3D, and the process can render continuously, restart after Unreal crashes, and resume rendering from the existing state."
-        ]
+          "Used Soft Cross Entropy with Student's t-distribution soft targets for distribution-aware coordinate supervision.",
+          "Used Wasserstein1DLoss to constrain the 1D distribution distance of predicted point locations.",
+          "Compared the source video, original prediction, fine-tuned prediction, and their overlay in the recording below."
+        ],
+        media: [{
+          id: "finetuned-2d-keypoint-comparison",
+          title: "Fine-tuned 2D Keypoint Comparison",
+          description: "A representative comparison of the source video, original prediction, fine-tuned prediction, and their overlay. The base model was already strong, so the visual difference is subtle.",
+          src: "videos/video-based-3d-human-pose-estimation/finetuned-2d-keypoint-comparison.mp4",
+          poster: "videos/video-based-3d-human-pose-estimation/finetuned-2d-keypoint-comparison.jpg",
+          type: "video/mp4"
+        }]
       },
       {
-        title: "Captured Data",
-        paragraphs: ["For each rendering run, the pipeline collected the information needed for model training and validation."],
+        title: "Image-aware 3D Pose Reconstruction",
+        paragraphs: ["A 2D-only pose-lifting model has an inherent depth ambiguity: similar 2D joint layouts can represent different 3D poses, such as a hand positioned in front of or behind the body. To address this, I trained the 2D-to-3D model from scratch and added pretrained ViT image features to the 2D joint input.", "The model is based on a modified MixSTE architecture. Each skeletal joint is represented as a token, and the input and output preserve the same number of joints. The network first applies a Spatial Transformer within each frame, then a Cross-Attention Transformer that fuses ViT image features with the joint-token representation, and finally a Temporal Transformer that models motion across frames before outputting a 3D coordinate for each joint."],
         bullets: [
-          "Camera parameters.",
-          "3D point data.",
-          "Skel-hit data.",
-          "Rendered video frames."
-        ]
+          "Input: 2D joint tokens and pretrained ViT image features.",
+          "Spatial Transformer → Cross-Attention Transformer → Temporal Transformer.",
+          "Output: one 3D coordinate for every corresponding input joint.",
+          "Used a simplified Gravity View training formulation: the camera is treated as fixed, with only pitch and tilt predicted to decouple the view and learn a stable 3D body structure."
+        ],
+        media: [{
+          id: "image-aware-3d-pose-reconstruction",
+          title: "Image-aware 2D-to-3D Pose Reconstruction",
+          description: "A 3D pose prediction produced by the model trained from scratch with both 2D joints and image features.",
+          src: "videos/video-based-3d-human-pose-estimation/image-aware-3d-pose-reconstruction.mp4",
+          poster: "videos/video-based-3d-human-pose-estimation/image-aware-3d-pose-reconstruction.jpg",
+          type: "video/mp4"
+        }]
       },
       {
-        title: "Frame Synchronisation Bug",
-        paragraphs: ["A major issue appeared during data collection: the 3D point data had a delay relative to the video, but it was not a simple fixed offset of several frames.", "The root cause was a timing mismatch in the Unreal / XRFeitoria collection flow. 3D point data was collected on each tick, while video frames were saved on rendered frames, so the two timelines were not guaranteed to match.", "I fixed the problem by modifying the 3D point acquisition logic: after each rendered frame was saved, the corresponding 3D point data was saved at the same point in the render loop. This aligned the labels with the video frames."]
+        title: "Linux Containerised Unreal Engine Rendering",
+        paragraphs: ["The existing rendering workflow was primarily Windows-based, particularly because of Style3D-related constraints. Deploying it as an automated Linux service was difficult because Unreal Engine's rendering process depends on a graphical display environment. A previous attempt to move the service to Linux had therefore not progressed.", "I independently researched and tested a deployment solution outside my regular work tasks. I ran the Windows version of Unreal Engine through Wine with a virtual display environment, allowing it to execute rendering jobs on a Linux server. I then packaged the setup as a reusable container and exposed the rendering capability as a Web service. The browser UI shown in the recording below is an optional monitoring layer and is not needed for production rendering."],
+        media: [{
+          id: "linux-container-rendering-service",
+          title: "Linux Container Rendering Service",
+          description: "A browser-based monitoring view of Unreal Engine rendering in the reusable Linux container. The UI is optional and is removed for production rendering.",
+          src: "videos/video-based-3d-human-pose-estimation/linux-container-rendering-service.mp4",
+          poster: "videos/video-based-3d-human-pose-estimation/linux-container-rendering-service.jpg",
+          type: "video/mp4"
+        }]
       },
-      { title: "My Contribution", paragraphs: ["I handled the model parsing and trainable-model reconstruction, designed the loss setup, built the UE rendering data workflow, and fixed the frame / 3D-point synchronisation issue in the data collection pipeline."] }
+      { title: "My Contribution", paragraphs: ["I worked across the entire pipeline: Unreal Engine and MetaHuman data production, animation retargeting and cleanup, aligned 2D / 3D label collection, the frame synchronisation fix, 2D model reconstruction and fine-tuning, image-aware 2D-to-3D model design, and Linux containerised rendering-service deployment."] }
     ]
   },
   {
@@ -579,6 +655,7 @@ const englishUi = {
   backToProjects: "Back to Projects",
   scrollVideosLeft: "Scroll videos left",
   scrollVideosRight: "Scroll videos right",
+  playVideo: "Play video",
   videoUnavailable: "Video pending",
   notFound: {
     title: "Page not found",
@@ -647,6 +724,7 @@ const chineseUi = {
   backToProjects: "返回项目列表",
   scrollVideosLeft: "向左滚动视频",
   scrollVideosRight: "向右滚动视频",
+  playVideo: "播放视频",
   videoUnavailable: "视频待添加",
   notFound: {
     title: "页面未找到",
@@ -983,71 +1061,127 @@ const chineseProjectText = [
     ]
   },
   {
-    title: "微调 2D 点检测模型",
+    title: "基于视频的 3D 人体姿态估计",
     period: "2026 年 6 月 - 至今",
     role: "AI 程序员实习生",
     status: "MuteGravity 实习项目 · 进行中",
-    mediaDetail: "可训练模型重建 · UE 合成数据流水线",
+    mediaDetail: "合成数据 · 2D 关键点 · 图像增强的 3D 重建",
     thumbnail: {
-      alt: "2D 点检测模型微调与 Unreal Engine 数据流水线缩略图。"
+      alt: "基于视频的 3D 人体姿态估计与 Unreal Engine 合成数据流水线缩略图。"
     },
-    summary: "一个基于 SimCC 的 2D 点检测模型微调项目：解析已有 .pth 预测模型，倒推出可训练模型并验证正确性，同时构建 UE 渲染数据生成流程。",
-    description: "这是我在 MuteGravity 担任 AI 程序员实习生期间参与的项目，结合 SimCC 模型重建、loss 设计和 Unreal Engine 合成数据生成，让一个原本只用于预测的 checkpoint 可以重新训练和验证。",
-    linkLabels: ["XRFeitoria"],
+    summary: "从 2D 关键点预测与图像特征到 3D 姿态重建：一个两阶段的基于视频的 3D 人体姿态估计流水线，覆盖 MetaHuman 合成数据生产、基于 SimCC 的 2D 关键点微调，以及基于改造 MixSTE 的图像增强 3D 姿态重建。",
+    description: "这是我在 MuteGravity 担任 AI 程序员实习生期间参与的项目：从 MetaHuman 渲染视频中获取对齐的 2D / 3D 监督数据，再将 2D 骨骼点 token 和预训练 ViT 图像特征结合，从视频中重建 3D 人体姿态。",
+    linkLabels: ["XRFeitoria", "MixSTE"],
     mediaGallery: {
-      title: "流程概览",
-      intro: "临时视觉图，用来概括模型重建、loss 设计，以及 BVH 到 FBX 再到 Unreal 渲染的数据流水线。",
+      title: "流程证据与结果展示",
+      intro: "封面图与四段项目录像依次展示对齐后的渲染标注、2D 微调对比、图像增强的 3D 重建，以及 Linux 容器化渲染服务。",
       items: [
         {
-          title: "2D 点检测流程",
-          description: "临时项目封面，展示合成数据和模型微调工作流。",
-          alt: "2D 点检测模型微调流程示意图。"
+          title: "两阶段流程",
+          description: "合成数据、2D 关键点和 3D 重建工作流的视觉概览。",
+          alt: "基于视频的 3D 人体姿态估计流程概览。"
+        },
+        {
+          title: "对齐后的渲染 2D 关键点",
+          description: "修复视频帧与标签同步延迟后，由 MetaHuman 3D 数据投影得到的 2D 关键点。"
+        },
+        {
+          title: "微调后的 2D 关键点对比",
+          description: "展示源视频、原模型预测、微调后预测和叠加结果。原始模型已经很强，因此视觉差异较小。"
+        },
+        {
+          title: "图像增强的 2D 到 3D 姿态重建",
+          description: "使用 2D 骨骼点和图像特征、从头训练的 3D 姿态预测结果。"
+        },
+        {
+          title: "Linux 容器化渲染服务",
+          description: "复用型 Linux 容器中 Unreal Engine 渲染的浏览器监控界面；可视化仅用于监控，生产渲染时可移除。"
         }
       ]
     },
     sections: [
-      { title: "项目概览", paragraphs: ["这是我从 2026 年 6 月开始在 MuteGravity 参与的实习项目，职位是 AI 程序员实习生。", "我拿到的是一个 .pth 格式的预测模型。模型使用 SimCC 形式做 2D 点检测，把坐标预测表示成分类式的坐标分布。核心任务是解析这个 checkpoint，倒推出可训练的模型结构，并验证重建后的可训练模型与原预测模型的一致性。", "完成模型重建后，我设计了微调目标，并将其接入通过 Unreal Engine 渲染生成的合成数据流程。"] },
       {
-        title: "模型重建与验证",
-        paragraphs: ["第一个技术难点是把只能预测的 checkpoint 还原成可以继续训练的模型。"],
+        title: "项目概览",
+        paragraphs: ["这是我从 2026 年 6 月起在 MuteGravity 参与的实习项目，也是一个两阶段的基于视频的 3D 人体姿态估计流水线。2D 关键点检测微调是第一阶段，图像增强的 3D 姿态重建是第二阶段。", "流程先在 Unreal Engine 中生成可控的 MetaHuman 视频与对齐标注，再使用生成数据微调 2D 关键点预测器，最后将 2D 关节预测和预训练图像特征结合来重建 3D 姿态。"],
+        media: [{
+          id: "video-based-3d-pose-cover",
+          title: "两阶段流程",
+          description: "合成数据、2D 关键点和 3D 重建工作流的视觉概览。",
+          src: "images/project-thumbnails/finetune-2d-point-detection.png",
+          alt: "基于视频的 3D 人体姿态估计流程概览。",
+          kind: "image"
+        }]
+      },
+      {
+        title: "MetaHuman 数据生产",
+        paragraphs: ["我搭建了用于生成两个模型阶段所需监督数据的 Unreal Engine 渲染流程。动作资源先被重定向到 MetaHuman 角色，再在渲染前进行清理与优化，以减少手部与身体等可见穿模。"],
         bullets: [
-          "解析已有 .pth 模型，理解 layer 结构和参数布局。",
-          "重建与 checkpoint 和 SimCC 输出格式兼容的可训练 PyTorch 模型。",
-          "通过与原预测模型进行结果对比，验证重建模型的正确性。"
+          "将 BVH 动作文件转换为 FBX，并使用 MotionBuilder 进行动作重定向。",
+          "生成动画、角色与场景放置、服装、Style3D 相关配置、相机轨迹与相机旋转的渲染配置文件。",
+          "通过 Python 和 XRFeitoria 驱动 Unreal Engine 持续渲染；Unreal 崩溃后可恢复，并能从已有进度继续。",
+          "采集渲染帧、相机信息、MetaHuman 3D 点数据、Skel-hit 数据和投影得到的 2D 关键点。"
         ]
       },
       {
-        title: "Loss 设计",
-        paragraphs: ["模型使用 SimCC，把每个 2D 点表示成 1D 坐标分布。Loss 设计使用面向分布的监督，使模型可以学习 soft coordinate target，而不是只依赖硬标签。"],
-        bullets: [
-          "Soft Cross Entropy：这里的 soft target 使用 Student-t 分布构造，用于更鲁棒的坐标分布监督。",
-          "Wasserstein1DLoss：用于约束预测点位置在 1D 分布上的距离。"
-        ]
+        title: "帧级标签同步",
+        paragraphs: ["早期采集流程存在严重的对齐问题：3D 点数据相对视频有延迟，而且并不是一个固定帧数的偏移。根因是采集时机不一致：3D 点在 Unreal Engine 的每个 tick 获取，视频帧则在渲染帧写入，两个时间线无法保证一一对应。", "我修改了采集逻辑，使每个渲染帧写入后立即保存其对应的 3D 点数据。这样，渲染帧、3D 姿态和 2D 相机投影就在同一个渲染循环节点对齐；下方投影录像展示了修复后得到的高精度 2D 标注。"],
+        media: [{
+          id: "rendered-2d-keypoint-projection",
+          title: "对齐后的渲染 2D 关键点",
+          description: "修复视频帧与标签同步延迟后，由 MetaHuman 3D 数据投影得到的 2D 关键点。",
+          src: "videos/video-based-3d-human-pose-estimation/rendered-2d-keypoint-projection.mp4",
+          poster: "videos/video-based-3d-human-pose-estimation/rendered-2d-keypoint-projection.jpg",
+          type: "video/mp4"
+        }]
       },
       {
-        title: "UE 渲染数据流水线",
-        paragraphs: ["数据生成主要依赖 Unreal Engine 渲染流程，整体分为三步。"],
+        title: "2D 关键点模型重建与微调",
+        paragraphs: ["我拿到的是一个采用 SimCC 坐标分类的、只能预测的 .pth checkpoint。我解析其 layer 和参数结构，重建了兼容且可训练的 PyTorch 模型，并验证重建模型与原模型的预测行为一致。", "原模型本身已经很强，因此微调后的视觉变化较小；微调的价值在于让检测模型适应渲染数据分布，成为可靠的 3D 重建输入阶段。"],
         bullets: [
-          "第一步：将 BVH 动作文件转换成 FBX 文件。这里使用 MotionBuilder 做动画重定向，并做动画优化，减少身体或服装穿模。",
-          "第二步：生成配置文件。每个渲染视频对应一批配置文件，配置中包含 FBX 动画、地图与角色放置位置、服装、Style3D 相关渲染配置、摄像机轨迹与旋转。",
-          "第三步：执行 Python 脚本，通过 XRFeitoria 操作 Unreal Engine 渲染视频。渲染流程也使用了 Style3D；流程可以持续渲染，即使 Unreal 崩溃也可以重启并继续从已有状态渲染。"
-        ]
+          "使用基于 Student-t 分布 soft target 的 Soft Cross Entropy，进行面向分布的坐标监督。",
+          "使用 Wasserstein1DLoss 约束预测点位置在 1D 分布上的距离。",
+          "下方录像并列展示了源视频、原始预测、微调预测和叠加对比。"
+        ],
+        media: [{
+          id: "finetuned-2d-keypoint-comparison",
+          title: "微调后的 2D 关键点对比",
+          description: "展示源视频、原模型预测、微调后预测和叠加结果。原始模型已经很强，因此视觉差异较小。",
+          src: "videos/video-based-3d-human-pose-estimation/finetuned-2d-keypoint-comparison.mp4",
+          poster: "videos/video-based-3d-human-pose-estimation/finetuned-2d-keypoint-comparison.jpg",
+          type: "video/mp4"
+        }]
       },
       {
-        title: "采集数据",
-        paragraphs: ["每次渲染会采集模型训练和验证所需要的信息。"],
+        title: "图像增强的 3D 姿态重建",
+        paragraphs: ["只输入 2D 关键点的 pose lifting 模型存在天然的深度歧义：相似的 2D 骨骼布局可能对应不同 3D 姿态，例如手究竟在身体前方还是后方。为解决这个问题，我从头训练 2D 到 3D 模型，并在 2D 关节输入中加入预训练 ViT 图像特征。", "模型基于改造后的 MixSTE。每个骨骼点都是一个 token，输入和输出的骨骼点数量保持一致。网络先在每一帧内通过 Spatial Transformer 建模骨骼点关系，然后通过 Cross-Attention Transformer 融合 ViT 图像特征与骨骼 token，最后由 Temporal Transformer 建模跨帧运动，并为每个关节输出 3D 坐标。"],
         bullets: [
-          "摄像机参数。",
-          "3D 点数据。",
-          "Skel hit 数据。",
-          "视频帧。"
-        ]
+          "输入：2D 关节 token 与预训练 ViT 图像特征。",
+          "Spatial Transformer → Cross-Attention Transformer → Temporal Transformer。",
+          "输出：每个输入骨骼点对应一个 3D 坐标。",
+          "训练采用简化的 Gravity View：假设相机固定，仅输出俯仰角和倾斜角以解耦视角，重点学习稳定的 3D 人体结构。"
+        ],
+        media: [{
+          id: "image-aware-3d-pose-reconstruction",
+          title: "图像增强的 2D 到 3D 姿态重建",
+          description: "使用 2D 骨骼点和图像特征、从头训练的 3D 姿态预测结果。",
+          src: "videos/video-based-3d-human-pose-estimation/image-aware-3d-pose-reconstruction.mp4",
+          poster: "videos/video-based-3d-human-pose-estimation/image-aware-3d-pose-reconstruction.jpg",
+          type: "video/mp4"
+        }]
       },
       {
-        title: "帧同步 Bug",
-        paragraphs: ["数据采集过程中遇到一个比较严重的问题：3D 点数据和视频帧之间存在延迟，但这个延迟不是固定相差几帧的简单问题。", "根因是 Unreal / XRFeitoria 的采集时机不一致：3D 点数据是在每个 tick 获取，而视频帧是在每个渲染帧保存，两条时间线不能保证完全一致。", "我修改了 3D 点获取逻辑：每次渲染帧保存后，同时保存对应的 3D 点数据。这样 3D 标签就和视频帧在同一个渲染循环节点对齐。"]
+        title: "Linux 容器化 Unreal Engine 渲染",
+        paragraphs: ["原有渲染流程主要基于 Windows，尤其受 Style3D 相关限制影响较大。由于 Unreal Engine 的渲染依赖图形显示环境，将其作为 Linux 自动化服务部署十分困难；此前将服务迁移到 Linux 的尝试也因此没有继续推进。", "我在工作之外独立研究并测试部署方案：通过 Wine 运行 Windows 版本的 Unreal Engine，并结合虚拟显示环境，让其能够在 Linux 服务器上完成渲染任务。我进一步将该环境封装为可复用容器，并把渲染能力作为 Web 服务提供。下方录像中的浏览器界面只是可选的监控层，生产渲染时不需要保留。"],
+        media: [{
+          id: "linux-container-rendering-service",
+          title: "Linux 容器化渲染服务",
+          description: "复用型 Linux 容器中 Unreal Engine 渲染的浏览器监控界面；可视化仅用于监控，生产渲染时可移除。",
+          src: "videos/video-based-3d-human-pose-estimation/linux-container-rendering-service.mp4",
+          poster: "videos/video-based-3d-human-pose-estimation/linux-container-rendering-service.jpg",
+          type: "video/mp4"
+        }]
       },
-      { title: "我的贡献", paragraphs: ["我负责模型解析和可训练模型重建，设计 loss 组合，搭建 UE 渲染数据流程，并修复数据采集中视频帧与 3D 点数据不同步的问题。"] }
+      { title: "我的贡献", paragraphs: ["我参与并完成了整条流程的工作：Unreal Engine 与 MetaHuman 数据生产、动作重定向与优化、对齐的 2D / 3D 标签采集、帧同步修复、2D 模型重建与微调、图像增强的 2D 到 3D 模型设计，以及 Linux 容器化渲染服务部署。"] }
     ]
   },
   {
