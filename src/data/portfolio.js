@@ -15,7 +15,7 @@ export const skills = [
   { group: "Languages", items: ["Python", "JavaScript", "C#", "HTML5 Canvas", "CSS"] },
   { group: "Game Development", items: ["Unity", "Unreal", "Pygame", "OpenGL", "Canvas 2D", "WebSocket", "Netcode"] },
   { group: "Backend & Data", items: ["FastAPI", "AsyncIO", "SQLAlchemy", "MySQL", "MongoDB"] },
-  { group: "AI & ML", items: ["PyTorch", "Reinforcement Learning", "PPO", "DQN", "VAE-GAN", "Transformer", "DINOv3", "MMPose"] },
+  { group: "AI & ML", items: ["PyTorch", "Reinforcement Learning", "PPO", "DQN", "CVAE", "VAE-GAN", "Transformer", "DINOv3", "MMPose"] },
   { group: "Systems", items: ["Multiprocessing", "Multithreading", "NumPy", "ctypes", "Docker", "Kubernetes"] },
   { group: "Tools", items: ["Git", "Vim", "Jenkins", "Unreal Engine", "Alibaba Cloud", "Kasm"] }
 ];
@@ -64,6 +64,121 @@ export const education = [
 ];
 
 export const projects = [
+  {
+    slug: "generalizable-card-game-ai",
+    title: "Generalizable Card Game AI",
+    period: "Jul. 2026 - Present",
+    role: "Research Engineer · Personal Project",
+    status: "Stage 1 implemented · Stage 2 proposed",
+    mediaLabel: "Generalizable Card Game AI",
+    mediaDetail: "Stage 1 architecture · four major model iterations",
+    thumbnail: {
+      src: "images/project-thumbnails/GeneralizableCardGameAI.png",
+      alt: "Research cover for Generalizable Card Game AI, showing an action-vector pretraining stage and a planned large-action-space SAC stage."
+    },
+    summary: "A two-stage research framework for a card-game agent that can reason about diverse cards rather than being tied to a fixed card catalogue.",
+    description: "Stage 1 is an action-conditioned state-transition model developed through four major architecture iterations. The Stage 2 large-action-space SAC policy remains a research proposal.",
+    technologies: ["Python", "PyTorch", "CVAE", "Transformer", "Action Embeddings", "Hungarian Matching", "SAC (planned)"],
+    links: [
+      { label: "Entropy 24(10), 1441", href: "https://www.mdpi.com/1099-4300/24/10/1441" },
+      { label: "Reference · arXiv:2206.12700", href: "https://arxiv.org/abs/2206.12700" },
+      { label: "Large Discrete Actions · arXiv:1512.07679", href: "https://arxiv.org/abs/1512.07679" }
+    ],
+    mediaGallery: {
+      title: "Stage 1 Architecture & Research Plan",
+      intro: "The final implemented Stage 1 model is shown alongside the broader two-stage research direction.",
+      items: [
+        {
+          id: "generalizable-card-game-ai-stage-1-architecture",
+          title: "Final Stage 1 State-Transition Architecture",
+          description: "The final plan-conditioned CVAE architecture: shared feature encoders, entity-aware transition encoding, four plan tokens, and structured existing-entity / birth-entity decoding.",
+          src: "images/generalizable-card-game-ai/end-to-end-game-state-transition.svg",
+          alt: "End-to-end structured game-state transition model architecture for the final Stage 1 card-game AI.",
+          kind: "image"
+        }
+      ]
+    },
+    sections: [
+      {
+        title: "Research Goal",
+        paragraphs: [
+          "Most card-game agents are built around a closed, fixed card set, which couples their action space tightly to known card identities. This project explores a different direction: learning action and state-transition representations that can describe varied card effects and game situations.",
+          "The aim is not to claim generalisation before it has been evaluated, but to build the representation layer needed for a policy that can transfer beyond a single fixed card catalogue. The project began in July 2026."
+        ]
+      },
+      {
+        title: "Two-Stage Training Plan",
+        paragraphs: [
+          "The project is deliberately separated into representation learning and decision learning. This avoids asking a reinforcement-learning policy to discover a useful action geometry from scratch in a large, compositional card-game action space."
+        ],
+        bullets: [
+          "Stage 1 — implemented: pretrain compact, action-conditioned transition representations with an autoencoding objective.",
+          "Stage 2 — proposed: combine the Stage 1 representation with a large-action-space reinforcement-learning framework and Soft Actor-Critic (SAC) to train the gameplay policy.",
+          "Only Stage 1 is presented as an implemented result on this page; Stage 2 is a documented research design, not a completed training result."
+        ]
+      },
+      {
+        title: "Stage 1 · Action-Conditioned Transition Model",
+        paragraphs: [
+          "The final Stage 1 implementation is a conditional variational autoencoder (CVAE) for structured, single-step card-game state transitions. It receives global game state, entities across nine game zones, card text and structured card attributes, the current action from 362 action classes, the played card, and Stack metadata.",
+          "Jina text embeddings encode card descriptions, while CardStateEncoder represents structured attributes such as type, mana cost, colour identity, keywords, combat values, tapped state, and base creature statistics. Residual CardFusion combines these signals, EntityStateTransformerEncoder models entities jointly across zones, and a TransitionPlanner exposes intermediate transition structure before decoding."
+        ],
+        bullets: [
+          "TransitionPlanner produces four interpretable plan tokens before decoding the next state.",
+          "Prior and posterior encoders learn latent transition paths for inference and training respectively.",
+          "The decoder predicts global-state changes, existing-entity destinations and attributes, and up to ten source-unknown birth entities."
+        ]
+      },
+      {
+        title: "Structured Synthesis and Entity Birth",
+        paragraphs: [
+          "Here, synthesis means reconstructing, predicting, and visualising structured game-state transitions—not image generation. The model predicts where existing cards move, how their attributes change, and whether an action introduces previously unseen entities such as summons or resolving spells.",
+          "For source-unknown entities, ten birth queries predict existence, destination zone, type, cost, combat statistics, and battle state. Hungarian matching aligns predicted birth slots with the entities observed in the target state without requiring a specific card ID to be generated directly."
+        ]
+      },
+      {
+        title: "Four Major Architecture Iterations",
+        paragraphs: [
+          "The model evolved through four major versions, each addressing a limitation exposed by the previous transition representation. The score below is reconstruction/score = 1 / (1 + reconstruction loss); higher is better."
+        ],
+        bullets: [
+          "specific_v01 — Established the CVAE baseline for global state and fixed-slot multi-zone reconstruction. It lacked explicit source-entity alignment and could not represent source-unknown new entities. Best stable 20-record score: 0.2502.",
+          "specific_entity_birth_v01 — Added EntityStateTransformer, existing-entity alignment, ten birth slots, and Hungarian matching. This made cross-zone movement and source-unknown entity generation explicit. Best stable score: 0.6179 (+147.0% vs. baseline).",
+          "specific_entity_birth_v02 — Added Residual CardFusion and deepened the birth decoder from two to five layers to improve card-semantic fusion and new-entity attribute decoding. Best stable score: 0.6992 (+13.2% vs. birth_v01).",
+          "specific_entity_birth_plan_wolpertinger_v01 — Added a four-token TransitionPlanner and plan-conditioned decoder to make action-to-state-change structure explicit, alongside binding augmentation for varied card-effect descriptions. Best stable score: 0.8717 (+24.7% vs. birth_v02; +248.4% observed vs. baseline)."
+        ]
+      },
+      {
+        title: "Metric Scope",
+        paragraphs: [
+          "Each figure is the best contiguous 20-training-record rolling average found in the corresponding training log, rather than a single high-variance batch. It communicates the best sustained reconstruction level reached during training."
+        ],
+        bullets: [
+          "Data source: /mnt/data/trainData/checkpoints/logs; metric tag: reconstruction/score.",
+          "The baseline and entity-birth architectures do not contain identical reconstruction-loss terms. Cross-architecture gains are therefore training-log observations, not a same-test-set benchmark.",
+          "The birth_v01 → birth_v02 → plan_v01 sequence is the most directly comparable evidence of continuous architectural improvement."
+        ]
+      },
+      {
+        title: "CV-Ready Summary",
+        paragraphs: [
+          "A concise, evidence-aware version for a CV or project summary:"
+        ],
+        bullets: [
+          "Built an action-conditioned CVAE–Transformer model for structured card-game state transitions from global state, card text and attributes, and 362 action types; evolved it through four major architecture iterations.",
+          "Introduced entity-level alignment, ten birth slots, Hungarian matching, Residual CardFusion, and a four-token TransitionPlanner to model cross-zone movement, source-unknown entities, and explicit transition structure.",
+          "Raised the best stable 20-record reconstruction score from 0.2502 to 0.8717 in training logs; comparable birth-model iterations improved from 0.6179 to 0.8717.",
+          "Designed, but have not yet implemented, a second-stage large-action-space SAC policy that will use the learned action representations for generalizable card-game play."
+        ]
+      },
+      {
+        title: "Key References",
+        paragraphs: [
+          "The linked references above include Entropy 24(10), 1441, the work at arXiv:2206.12700, and Deep Reinforcement Learning in Large Discrete Action Spaces at arXiv:1512.07679. They inform the project’s representation-learning and planned policy-learning directions."
+        ]
+      }
+    ]
+  },
   {
     slug: "magic-fan-made",
     title: "Magic Fan Made — Game System",
@@ -788,7 +903,7 @@ const chineseSkills = [
   { group: "编程语言", items: ["Python", "JavaScript", "C#", "HTML5 Canvas", "CSS"] },
   { group: "游戏开发", items: ["Unity", "Unreal", "Pygame", "OpenGL", "Canvas 2D", "WebSocket", "Netcode"] },
   { group: "后端与数据", items: ["FastAPI", "AsyncIO", "SQLAlchemy", "MySQL", "MongoDB"] },
-  { group: "AI 与机器学习", items: ["PyTorch", "Reinforcement Learning", "PPO", "DQN", "VAE-GAN", "Transformer", "DINOv3", "MMPose"] },
+  { group: "AI 与机器学习", items: ["PyTorch", "Reinforcement Learning", "PPO", "DQN", "CVAE", "VAE-GAN", "Transformer", "DINOv3", "MMPose"] },
   { group: "系统能力", items: ["Multiprocessing", "Multithreading", "NumPy", "ctypes", "Docker", "Kubernetes"] },
   { group: "工具", items: ["Git", "Vim", "Jenkins", "Unreal Engine", "Alibaba Cloud", "Kasm"] }
 ];
@@ -837,6 +952,100 @@ const chineseEducation = [
 ];
 
 const chineseProjectText = [
+  {
+    title: "通用化卡牌游戏 AI",
+    period: "2026 年 7 月 - 至今",
+    role: "研究工程师 · 个人项目",
+    status: "第一阶段已实现 · 第二阶段为方案设计",
+    mediaDetail: "第一阶段架构 · 四次重大模型迭代",
+    thumbnail: {
+      alt: "Generalizable Card Game AI 研究封面，展示动作向量预训练阶段与规划中的大型动作空间 SAC 阶段。"
+    },
+    summary: "一个两阶段研究框架，目标是让卡牌游戏智能体能够理解多样的卡牌，而不是绑定在固定的卡牌集合上。",
+    description: "第一阶段是历经四次重大架构迭代的、由动作条件控制的状态转移模型；第二阶段的大型动作空间 SAC 策略仍处于研究设计阶段。",
+    linkLabels: ["Entropy 24(10), 1441", "参考文献 · arXiv:2206.12700", "大型离散动作 · arXiv:1512.07679"],
+    mediaGallery: {
+      title: "第一阶段架构与研究计划",
+      intro: "展示最终实现的第一阶段模型架构，以及整体两阶段研究方向。",
+      items: [
+        {
+          title: "最终第一阶段状态转移架构",
+          description: "最终的 plan-conditioned CVAE 架构：共享特征编码器、实体级转移编码、4 个 plan token，以及结构化的已有实体／新实体解码。",
+          alt: "Generalizable Card Game AI 最终第一阶段的端到端结构化游戏状态转移模型架构。"
+        }
+      ]
+    },
+    sections: [
+      {
+        title: "研究目标",
+        paragraphs: [
+          "多数卡牌游戏 AI 面向封闭且固定的卡牌集合构建，动作空间与已知卡牌 ID 紧密绑定。本项目探索另一条路径：学习可以描述多样卡牌效果和游戏状态的动作表示与状态转移表示。",
+          "目标并不是在没有完成评估前宣称具备泛化能力，而是先构建一个能支撑策略跨越固定卡牌目录的表征层。项目于 2026 年 7 月开始。"
+        ]
+      },
+      {
+        title: "两阶段训练计划",
+        paragraphs: ["项目将表征学习和决策学习分开进行，避免让强化学习策略直接在大型、组合式卡牌动作空间中从零学习出有意义的动作几何结构。"],
+        bullets: [
+          "阶段一——已实现：使用 autoencoding 目标预训练紧凑的、由动作条件控制的状态转移表示。",
+          "阶段二——规划中：将阶段一表征与大型动作空间强化学习框架和 Soft Actor-Critic (SAC) 结合，训练游戏决策策略。",
+          "本页仅将阶段一展示为已完成结果；阶段二是已写明的研究设计，而非完成的训练结果。"
+        ]
+      },
+      {
+        title: "阶段一 · 由动作条件控制的状态转移模型",
+        paragraphs: [
+          "最终实现是用于结构化、单步卡牌游戏状态转移的 Conditional Variational Autoencoder (CVAE)。输入包括全局游戏状态、九个游戏区域中的实体、卡牌文本及结构化属性、362 类当前动作、被使用的卡牌和 Stack 元数据。",
+          "Jina 文本嵌入编码卡牌描述，CardStateEncoder 表示类型、费用、颜色身份、关键词、战斗数值、横置状态和生物基础属性等结构化信息。Residual CardFusion 融合这些信号，EntityStateTransformerEncoder 对各区域实体进行联合建模，TransitionPlanner 在解码前显式暴露中间转移结构。"
+        ],
+        bullets: [
+          "TransitionPlanner 在解码下一状态前生成四个可解释的 plan token。",
+          "Prior 与 Posterior encoder 分别学习推理和训练时的潜在状态转移路径。",
+          "Decoder 预测全局状态变化、原有实体的去向与属性，以及最多十个来源未知的 birth entities。"
+        ]
+      },
+      {
+        title: "结构化 Synthesis 与新实体生成",
+        paragraphs: [
+          "这里的 synthesis 指结构化游戏状态转移的重构、预测和可视化，并非图像生成。模型预测已有卡牌如何移动、属性如何变化，以及行动是否产生召唤物或结算法术等新的实体。",
+          "针对来源未知的新实体，十个 birth query 预测其存在性、目标区域、类型、费用、战斗数值和战斗状态。Hungarian matching 将预测的 birth slot 与目标状态中观察到的实体对齐，而不需要直接生成具体卡牌 ID。"
+        ]
+      },
+      {
+        title: "四次重大架构迭代",
+        paragraphs: ["模型经历四个主要版本，每次迭代都针对上一版状态转移表示暴露出的限制。下列分数为 reconstruction/score = 1 / (1 + reconstruction loss)，数值越高越好。"],
+        bullets: [
+          "specific_v01 —— 建立 CVAE 基线，用于全局状态和固定 slot 的多区域重构；缺少源实体显式对齐，且无法表示来源未知的新实体。最佳稳定 20 条记录分数：0.2502。",
+          "specific_entity_birth_v01 —— 引入 EntityStateTransformer、已有实体对齐、10 个 birth slots 与 Hungarian matching，使跨区域移动和来源未知实体生成能够被显式建模。最佳稳定分数：0.6179（相对基线 +147.0%）。",
+          "specific_entity_birth_v02 —— 加入 Residual CardFusion，并将 birth decoder 从 2 层加深至 5 层，增强卡牌语义融合和新实体属性解码。最佳稳定分数：0.6992（相对 birth_v01 +13.2%）。",
+          "specific_entity_birth_plan_wolpertinger_v01 —— 加入 4-token TransitionPlanner 与 plan-conditioned decoder，使动作到状态变化的中间结构可被显式建模；同时通过 binding augmentation 适应不同的卡牌效果描述。最佳稳定分数：0.8717（相对 birth_v02 +24.7%；相对基线观测值 +248.4%）。"
+        ]
+      },
+      {
+        title: "指标口径与边界",
+        paragraphs: ["每个数字均取对应训练日志中最佳连续 20 条训练记录的滚动平均，而非单个波动较大的 batch；它反映模型在训练中曾达到的最佳稳定重构水平。"],
+        bullets: [
+          "数据来源：/mnt/data/trainData/checkpoints/logs；指标标签：reconstruction/score。",
+          "基线与实体 birth 架构所含的 reconstruction loss 项不完全一致，因此跨架构提升应理解为训练日志中的观测结果，而非同一测试集 benchmark。",
+          "birth_v01 → birth_v02 → plan_v01 的连续迭代使用更相近的目标，因此是更直接的架构改进依据。"
+        ]
+      },
+      {
+        title: "简历精简版",
+        paragraphs: ["适合简历或项目摘要的、包含证据边界的精简表述："],
+        bullets: [
+          "构建由动作条件控制的 CVAE–Transformer 卡牌游戏状态转移模型，输入全局状态、卡牌文本和结构化属性，以及 362 类动作；完成四次重大架构迭代。",
+          "引入实体级对齐、10 个 birth slots、Hungarian matching、Residual CardFusion 和 4-token TransitionPlanner，建模跨区域移动、来源未知新实体和显式状态转移结构。",
+          "训练日志中的最佳稳定 20 条记录 reconstruction score 从 0.2502 提升至 0.8717；可直接比较的 birth 系列从 0.6179 持续提升至 0.8717。",
+          "设计但尚未实现第二阶段的大型动作空间 SAC 策略，计划使用已学习的动作表示实现可泛化的卡牌游戏决策。"
+        ]
+      },
+      {
+        title: "主要参考论文",
+        paragraphs: ["页面上方链接包括 Entropy 24(10), 1441、arXiv:2206.12700 的论文，以及 arXiv:1512.07679 的 Deep Reinforcement Learning in Large Discrete Action Spaces。这些工作启发了项目的表征学习和规划中的策略学习方向。"]
+      }
+    ]
+  },
   {
     title: "Magic Fan Made — 游戏系统",
     period: "2024 年 1 月 - 至今",

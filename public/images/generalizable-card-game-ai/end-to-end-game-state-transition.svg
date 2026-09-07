@@ -1,0 +1,1772 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3240" height="2830" viewBox="0 0 3240 2830" version="1.1">
+  <title id="figure-title">End-to-End Structured Game-State Transition Model</title>
+  <desc id="figure-description">Panels (a) and (b) show the transition encoder and entity decoder. The blue cross-panel connection transfers source entity tokens H_s, deterministic plan P, and posterior sample z_q. The KL term shown in the encoder corresponds to the KL term in the decoder training objective. Panel (c) is an expanded view of Shared Feature Encoders in panel (a); the gray dashed leader indicates this detail relationship, not data flow. Every diagram, label, formula, token and connector remains editable SVG.</desc>
+  <defs id="figure-definitions">
+    <marker id="figure-arrow-interface" markerUnits="userSpaceOnUse" markerWidth="19" markerHeight="18" refX="17" refY="9" orient="auto">
+      <path d="M0 0 L17 9 L0 18 Z" fill="#176fc3"/>
+    </marker>
+    <linearGradient id="enc-panel-neutral" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#eaf0f3"/>
+      <stop offset="1" stop-color="#e6edf1"/>
+    </linearGradient>
+    <linearGradient id="enc-panel-blue" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#d3efff"/>
+      <stop offset="1" stop-color="#ccecff"/>
+    </linearGradient>
+    <linearGradient id="enc-block-blue" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#c3e7fa"/>
+      <stop offset=".6" stop-color="#d6effc"/>
+      <stop offset="1" stop-color="#bce3f9"/>
+    </linearGradient>
+    <linearGradient id="enc-panel-green" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#e3f5e2"/>
+      <stop offset="1" stop-color="#eaf7e9"/>
+    </linearGradient>
+    <linearGradient id="enc-block-green" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#ceeac7"/>
+      <stop offset=".5" stop-color="#def3d9"/>
+      <stop offset="1" stop-color="#c9e7c3"/>
+    </linearGradient>
+    <linearGradient id="enc-panel-orange" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#fff0df"/>
+      <stop offset="1" stop-color="#ffe9d6"/>
+    </linearGradient>
+    <linearGradient id="enc-block-orange" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#ffdfbb"/>
+      <stop offset=".6" stop-color="#ffe9d0"/>
+      <stop offset="1" stop-color="#ffdfbd"/>
+    </linearGradient>
+    <linearGradient id="enc-panel-purple" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#ecdfff"/>
+      <stop offset=".6" stop-color="#f2eaff"/>
+      <stop offset="1" stop-color="#e7d9fb"/>
+    </linearGradient>
+    <linearGradient id="enc-token-blue" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#80c1fa"/>
+      <stop offset=".5" stop-color="#8dc6fa"/>
+      <stop offset="1" stop-color="#8ac5f8"/>
+    </linearGradient>
+    <linearGradient id="enc-token-green" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#8ec584"/>
+      <stop offset=".6" stop-color="#add4a4"/>
+      <stop offset="1" stop-color="#9dca92"/>
+    </linearGradient>
+    <linearGradient id="enc-token-orange" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#ffca93"/>
+      <stop offset=".5" stop-color="#ffd9af"/>
+      <stop offset="1" stop-color="#ffca96"/>
+    </linearGradient>
+    <linearGradient id="enc-token-purple" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#c49cee"/>
+      <stop offset=".5" stop-color="#caa7f3"/>
+      <stop offset="1" stop-color="#c3a0ee"/>
+    </linearGradient>
+    <style>#panel-a-transition-encoder text {font-family:'Times New Roman',Times,serif}
+#panel-a-transition-encoder path, #panel-a-transition-encoder line {stroke-linecap:butt}
+</style>
+    <marker id="enc-arrow-blue" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" refX="13" refY="7" orient="auto">
+      <path d="M0 0 13 7 0 14Z" fill="#007cff"/>
+    </marker>
+    <marker id="enc-arrow-blue-small" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="11" refY="6" orient="auto">
+      <path d="M0 0 11 6 0 12Z" fill="#007cff"/>
+    </marker>
+    <marker id="enc-arrow-orange" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" refX="13" refY="7" orient="auto">
+      <path d="M0 0 13 7 0 14Z" fill="#ff7b08"/>
+    </marker>
+    <marker id="enc-arrow-orange-small" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="11" refY="6" orient="auto">
+      <path d="M0 0 11 6 0 12Z" fill="#ff7b08"/>
+    </marker>
+    <marker id="enc-arrow-green" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" refX="13" refY="7" orient="auto">
+      <path d="M0 0 13 7 0 14Z" fill="#0c8819"/>
+    </marker>
+    <marker id="enc-arrow-green-small" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="11" refY="6" orient="auto">
+      <path d="M0 0 11 6 0 12Z" fill="#0c8819"/>
+    </marker>
+    <marker id="enc-arrow-purple" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" refX="13" refY="7" orient="auto">
+      <path d="M0 0 13 7 0 14Z" fill="#7d29d0"/>
+    </marker>
+    <marker id="enc-arrow-purple-small" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="11" refY="6" orient="auto">
+      <path d="M0 0 11 6 0 12Z" fill="#7d29d0"/>
+    </marker>
+    <marker id="enc-arrow-black" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" refX="13" refY="7" orient="auto">
+      <path d="M0 0 13 7 0 14Z" fill="#050808"/>
+    </marker>
+    <marker id="enc-arrow-black-small" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="11" refY="6" orient="auto">
+      <path d="M0 0 11 6 0 12Z" fill="#050808"/>
+    </marker>
+    <linearGradient id="dec-panel-blue" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#eef6ff"/>
+      <stop offset="1" stop-color="#eaf4ff"/>
+    </linearGradient>
+    <linearGradient id="dec-decoder-blue" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#deecff"/>
+      <stop offset="1" stop-color="#d9e9fc"/>
+    </linearGradient>
+    <linearGradient id="dec-fusion-blue" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#e3efff"/>
+      <stop offset="1" stop-color="#e4eeff"/>
+    </linearGradient>
+    <linearGradient id="dec-panel-purple" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#eaddf5"/>
+      <stop offset="1" stop-color="#e5d9f0"/>
+    </linearGradient>
+    <linearGradient id="dec-panel-orange" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#ffecd9"/>
+      <stop offset="1" stop-color="#ffe9d9"/>
+    </linearGradient>
+    <linearGradient id="dec-token-blue" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#69b0f3"/>
+      <stop offset=".55" stop-color="#7dbbf2"/>
+      <stop offset="1" stop-color="#74b5f0"/>
+    </linearGradient>
+    <linearGradient id="dec-token-purple" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#ae87dc"/>
+      <stop offset=".55" stop-color="#bc9be4"/>
+      <stop offset="1" stop-color="#b18bdc"/>
+    </linearGradient>
+    <style>#panel-b-entity-decoder text {font-family:'Times New Roman',Times,serif}
+</style>
+    <marker id="dec-arrow-blue" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" refX="13" refY="7" orient="auto">
+      <path d="M0 0 13 7 0 14Z" fill="#096ec8"/>
+    </marker>
+    <marker id="dec-arrow-blue-small" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="11" refY="6" orient="auto">
+      <path d="M0 0 11 6 0 12Z" fill="#096ec8"/>
+    </marker>
+    <marker id="dec-arrow-purple" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" refX="13" refY="7" orient="auto">
+      <path d="M0 0 13 7 0 14Z" fill="#7b3cb2"/>
+    </marker>
+    <marker id="dec-arrow-purple-small" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="11" refY="6" orient="auto">
+      <path d="M0 0 11 6 0 12Z" fill="#7b3cb2"/>
+    </marker>
+    <marker id="dec-arrow-target" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M1 1 10 6 1 11" fill="none" stroke="#ff790c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <linearGradient id="features-panel-blue" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#eaf8ff"/>
+      <stop offset="1" stop-color="#edf9ff"/>
+    </linearGradient>
+    <linearGradient id="features-panel-green" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#eafbef"/>
+      <stop offset="1" stop-color="#ecfcf0"/>
+    </linearGradient>
+    <linearGradient id="features-panel-orange" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#fff1e3"/>
+      <stop offset="1" stop-color="#fff3e9"/>
+    </linearGradient>
+    <linearGradient id="features-panel-purple" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#f1eaff"/>
+      <stop offset="1" stop-color="#f4edff"/>
+    </linearGradient>
+    <linearGradient id="features-blue-fill" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#b8e5fc"/>
+      <stop offset=".5" stop-color="#c4eaff"/>
+      <stop offset="1" stop-color="#caecff"/>
+    </linearGradient>
+    <linearGradient id="features-cell-fill" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#6cbaf1"/>
+      <stop offset=".55" stop-color="#89ccf8"/>
+      <stop offset="1" stop-color="#9bd5fb"/>
+    </linearGradient>
+    <linearGradient id="features-green-fill" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#b9edb8"/>
+      <stop offset=".5" stop-color="#b7edbb"/>
+      <stop offset="1" stop-color="#c6f0c8"/>
+    </linearGradient>
+    <linearGradient id="features-attribute-fill" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#dbf9dc"/>
+      <stop offset="1" stop-color="#cbf0cc"/>
+    </linearGradient>
+    <linearGradient id="features-orange-fill" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#ffd093"/>
+      <stop offset="1" stop-color="#ffe1ab"/>
+    </linearGradient>
+    <linearGradient id="features-purple-fill" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#c5a5ff"/>
+      <stop offset=".5" stop-color="#d5bdff"/>
+      <stop offset="1" stop-color="#cbb0ff"/>
+    </linearGradient>
+    <marker id="features-arrow-blue" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="11" refX="11" refY="5.5" orient="auto">
+      <path d="M0 0 11 5.5 0 11Z" fill="#1458ff"/>
+    </marker>
+    <marker id="features-arrow-navy" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+      <path d="M0 0 9 5 0 10Z" fill="#080e57"/>
+    </marker>
+    <marker id="features-arrow-black" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="10" refX="10" refY="5" orient="auto">
+      <path d="M0 0 10 5 0 10Z" fill="#111511"/>
+    </marker>
+    <marker id="features-arrow-small-blue" markerUnits="userSpaceOnUse" markerWidth="5" markerHeight="4" refX="4" refY="2" orient="auto">
+      <path d="M0 0 4 2 0 4Z" fill="#65ace2"/>
+    </marker>
+    <marker id="features-arrow-small-black" markerUnits="userSpaceOnUse" markerWidth="5" markerHeight="5" refX="5" refY="2.5" orient="auto">
+      <path d="M0 0 5 2.5 0 5Z" fill="#161d18"/>
+    </marker>
+    <style>#panel-c-detailed-feature-encoders text {font-family:Arial,Helvetica,sans-serif;fill:#080d32}
+#panel-c-detailed-feature-encoders .bold {font-weight:700}
+#panel-c-detailed-feature-encoders .black {fill:#080a09}
+#panel-c-detailed-feature-encoders .math {font-family:'Times New Roman',Times,serif;font-weight:700}
+#panel-c-detailed-feature-encoders .token-frame {fill:#edfaff;stroke:#075dff;stroke-width:1.25}
+#panel-c-detailed-feature-encoders .matrix-cell {fill:url(#features-cell-fill)}
+#panel-c-detailed-feature-encoders .scalar-box {fill:url(#features-blue-fill);stroke:#288aff;stroke-width:1.15}
+#panel-c-detailed-feature-encoders .feature-box {fill:url(#features-blue-fill);stroke:#63b1f5;stroke-width:1.1}
+#panel-c-detailed-feature-encoders .vector-box {fill:url(#features-purple-fill);stroke:#8225ff;stroke-width:1.7}
+#panel-c-detailed-feature-encoders .brace {fill:none;stroke:#292555;stroke-width:1.25;stroke-linecap:round;stroke-linejoin:round}
+#panel-c-detailed-feature-encoders .blue-arrow {fill:none;stroke:#175cff;stroke-width:2;marker-end:url(#features-arrow-blue)}
+#panel-c-detailed-feature-encoders .navy-arrow {fill:none;stroke:#0b165d;stroke-width:1.65;marker-end:url(#features-arrow-navy)}
+#panel-c-detailed-feature-encoders .black-arrow {fill:none;stroke:#111511;stroke-width:1.7;marker-end:url(#features-arrow-black)}
+#panel-c-detailed-feature-encoders .small-blue-arrow {fill:none;stroke:#6aafe2;stroke-width:1;marker-end:url(#features-arrow-small-blue)}
+#panel-c-detailed-feature-encoders .small-black-arrow {fill:none;stroke:#202820;stroke-width:1.1;marker-end:url(#features-arrow-small-black)}
+#panel-c-detailed-feature-encoders .green-box {fill:url(#features-green-fill);stroke:#098b19;stroke-width:1.55}
+#panel-c-detailed-feature-encoders .attribute-box {fill:url(#features-attribute-fill);stroke:#80c181;stroke-width:.9}
+#panel-c-detailed-feature-encoders .operation-box {fill:#f3fff4;fill-opacity:.94}
+#panel-c-detailed-feature-encoders .orange-box {fill:url(#features-orange-fill);stroke:#ff660b;stroke-width:1.2}
+
+    </style>
+  </defs>
+  <g id="background">
+    <rect x="0" y="0" width="3240" height="2830" fill="#ffffff"/>
+  </g>
+  <g id="figure-headings" font-family="Arial, Helvetica, sans-serif" fill="#101d35">
+    <text x="1620" y="68" font-size="44" font-weight="700" text-anchor="middle" id="main-title">End-to-End Structured Game-State Transition Model</text>
+    <text x="1620" y="113" font-size="23" text-anchor="middle" fill="#56667b" id="main-subtitle">Shared feature encoding  ·  transition representation  ·  entity state generation</text>
+    <line x1="185" y1="153" x2="3055" y2="153" stroke="#c7d2de" stroke-width="1.5"/>
+    <text x="147" y="225" font-family="Times New Roman, Times, serif" font-size="36" font-weight="700" fill="#0a315d">(a)</text>
+    <text x="1794" y="225" font-family="Times New Roman, Times, serif" font-size="36" font-weight="700" fill="#0a315d">(b)</text>
+  </g>
+  <g id="panel-a-transition-encoder" transform="translate(75 190)">
+    <title>Encoder Stage: Structured Transition Representation Learning</title>
+    <text x="0" y="0" font-size="36" font-weight="700" fill="#090b10" id="enc-title" transform="translate(243.5 35) scale(0.98272 1)">Encoder Stage: Structured Transition Representation Learning</text>
+    <g id="enc-training-transition-sample">
+      <rect x="222" y="56.5" width="1004" height="157" rx="14" fill="url(#enc-panel-neutral)" stroke="#7e909e" stroke-width="2.4" id="enc-sample-background"/>
+      <rect x="228" y="91" width="992" height="116.5" rx="14" fill="#f7fbfd" id="enc-sample-content-background" fill-opacity="0.85"/>
+      <text x="0" y="0" font-size="25" font-weight="700" fill="#090b10" text-anchor="middle" id="enc-sample-title" transform="translate(724 81.5) scale(0.95441 1)">Training Transition Sample</text>
+      <line x1="432" y1="101" x2="432" y2="197" stroke="#91a6b4" stroke-width="1.3" id="enc-sample-column-divider-1"/>
+      <line x1="632" y1="101" x2="632" y2="197" stroke="#91a6b4" stroke-width="1.3" id="enc-sample-column-divider-2"/>
+      <line x1="982" y1="101" x2="982" y2="197" stroke="#91a6b4" stroke-width="1.3" id="enc-sample-column-divider-3"/>
+      <g id="enc-sample-source-state">
+        <text x="327" y="113" font-size="29" font-style="italic" font-weight="700" text-anchor="middle" fill="#090b10" id="enc-sample-source-symbol" xml:space="preserve">s<tspan baseline-shift="sub" font-size="70%">t</tspan></text>
+        <g id="enc-source-state-row-1">
+          <g id="enc-source-state-row-1-1">
+            <rect x="289.75" y="132" width="20.5" height="18.5" rx="2.5" fill="url(#enc-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="291.05" y="133.3" width="17.9" height="15.9" rx="1.5" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="enc-source-state-row-1-2">
+            <rect x="316.75" y="132" width="20.5" height="18.5" rx="2.5" fill="url(#enc-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="318.05" y="133.3" width="17.9" height="15.9" rx="1.5" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="enc-source-state-row-1-3">
+            <rect x="343.75" y="132" width="20.5" height="18.5" rx="2.5" fill="url(#enc-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="345.05" y="133.3" width="17.9" height="15.9" rx="1.5" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+        </g>
+        <g id="enc-source-state-row-2">
+          <g id="enc-source-state-row-2-1">
+            <rect x="289.75" y="156" width="20.5" height="18.5" rx="2.5" fill="url(#enc-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="291.05" y="157.3" width="17.9" height="15.9" rx="1.5" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="enc-source-state-row-2-2">
+            <rect x="316.75" y="156" width="20.5" height="18.5" rx="2.5" fill="url(#enc-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="318.05" y="157.3" width="17.9" height="15.9" rx="1.5" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="enc-source-state-row-2-3">
+            <rect x="343.75" y="156" width="20.5" height="18.5" rx="2.5" fill="url(#enc-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="345.05" y="157.3" width="17.9" height="15.9" rx="1.5" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+        </g>
+        <text x="327" y="200" font-size="19.5" font-weight="400" fill="#090b10" text-anchor="middle" id="enc-sample-source-caption">(state tokens)</text>
+      </g>
+      <g id="enc-sample-discrete-action">
+        <text x="532" y="113" font-size="29" font-style="italic" font-weight="700" text-anchor="middle" fill="#090b10" id="enc-sample-action-symbol" xml:space="preserve">a<tspan baseline-shift="sub" font-size="70%">t</tspan></text>
+        <g id="enc-sample-action-values">
+          <g id="enc-sample-action-values-1">
+            <rect x="490.0" y="141.5" width="23.8" height="23.8" rx="3" fill="url(#enc-token-green)" stroke="#217a1d" stroke-width="1.6"/>
+            <rect x="491.3" y="142.8" width="21.2" height="21.2" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="enc-sample-action-values-2">
+            <rect x="520.1" y="141.5" width="23.8" height="23.8" rx="3" fill="url(#enc-token-green)" stroke="#217a1d" stroke-width="1.6"/>
+            <rect x="521.4" y="142.8" width="21.2" height="21.2" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="enc-sample-action-values-3">
+            <rect x="550.2" y="141.5" width="23.8" height="23.8" rx="3" fill="url(#enc-token-green)" stroke="#217a1d" stroke-width="1.6"/>
+            <rect x="551.5" y="142.8" width="21.2" height="21.2" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+        </g>
+        <text x="532" y="200" font-size="19.5" font-weight="400" fill="#090b10" text-anchor="middle" id="enc-sample-action-caption">(discrete action)</text>
+      </g>
+      <g id="enc-sample-card">
+        <text x="807" y="113" font-size="29" font-style="italic" font-weight="700" text-anchor="middle" fill="#090b10" id="enc-sample-card-symbol" xml:space="preserve">c<tspan baseline-shift="sub" font-size="70%">t</tspan></text>
+        <g id="enc-sample-card-face" transform="translate(-5.5 5)">
+          <rect x="671.5" y="119.5" width="42" height="54.5" rx="3" fill="#fcfeff" stroke="#507da6" stroke-width="1.5" id="enc-card-outline"/>
+          <rect x="675" y="123" width="35" height="7" rx="1.5" fill="#e2effa" id="enc-card-title-band"/>
+          <text x="678" y="128.5" font-size="7.3" font-weight="700" fill="#244e78" id="enc-card-name">Card</text>
+          <circle id="enc-card-mana-indicator" cx="705.8" cy="126.5" r="2.35" fill="#a4c999" stroke="#54854b" stroke-width=".6"/>
+          <rect x="675" y="132" width="35" height="17" rx="1.2" fill="url(#enc-block-blue)" stroke="#9cbad3" stroke-width="0.65" id="enc-card-art-frame"/>
+          <path d="M687.5 135.2 H697.5 V141.4 Q697.5 144.4 692.5 147 Q687.5 144.4 687.5 141.4Z" fill="#edf8ff" stroke="#527da4" stroke-width="0.9" id="enc-card-shield-art"/>
+          <path d="M692.5 137.5 V143.7 M689.6 140.6 H695.4" fill="none" stroke="#7c9fbb" stroke-width="0.75" id="enc-card-shield-detail"/>
+          <g id="enc-card-rules-text-lines">
+            <line x1="677" y1="153.5" x2="707" y2="153.5" stroke="#68859d" stroke-width="0.8"/>
+            <line x1="677" y1="157" x2="702" y2="157" stroke="#68859d" stroke-width="0.8"/>
+          </g>
+          <rect x="675" y="161" width="35" height="9" rx="1.2" fill="#edf5fa" id="enc-card-combat-stats-band"/>
+          <text x="692.5" y="167.5" font-size="6.3" font-weight="700" fill="#426683" text-anchor="middle" id="enc-card-combat-stats-label">ATK / DEF</text>
+        </g>
+        <g id="enc-sample-card-field-guides">
+          <path d="M708 160 H721 V137 H734" fill="none" stroke="#829caf" stroke-width="1.05" id="enc-card-description-guide" stroke-linejoin="round"/>
+          <line x1="708" y1="170.5" x2="734" y2="170.5" stroke="#829caf" stroke-width="1.05" id="enc-card-attributes-guide"/>
+        </g>
+        <rect x="734" y="125" width="222" height="24" rx="4" fill="#fff" stroke="#8296a3" stroke-width="1.3" id="enc-card-description"/>
+        <text x="845" y="142.5" font-size="17" font-weight="400" fill="#090b10" text-anchor="middle" id="enc-card-description-label">card description</text>
+        <rect x="734" y="156" width="222" height="24" rx="4" fill="#fff" stroke="#8296a3" stroke-width="1.3" id="enc-card-attributes"/>
+        <text x="845" y="173.5" font-size="17" font-weight="400" fill="#090b10" text-anchor="middle" id="enc-card-attributes-label">type · mana cost · stats</text>
+        <text x="807" y="200" font-size="19.5" font-weight="400" fill="#090b10" text-anchor="middle" id="enc-sample-card-caption">(text + structured attributes)</text>
+      </g>
+      <g id="enc-sample-target-state">
+        <text x="1104" y="113" font-size="29" font-style="italic" font-weight="700" text-anchor="middle" fill="#090b10" id="enc-sample-target-symbol" xml:space="preserve">s<tspan baseline-shift="sub" font-size="70%">t+1</tspan></text>
+        <g id="enc-target-state-row-1">
+          <g id="enc-target-state-row-1-1">
+            <rect x="1065.75" y="132" width="20.5" height="18.6" rx="2.5" fill="url(#enc-token-orange)" stroke="#fb6a00" stroke-width="1.6"/>
+            <rect x="1067.05" y="133.3" width="17.9" height="16.0" rx="1.5" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="enc-target-state-row-1-2">
+            <rect x="1093.75" y="132" width="20.5" height="18.6" rx="2.5" fill="url(#enc-token-orange)" stroke="#fb6a00" stroke-width="1.6"/>
+            <rect x="1095.05" y="133.3" width="17.9" height="16.0" rx="1.5" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="enc-target-state-row-1-3">
+            <rect x="1121.75" y="132" width="20.5" height="18.6" rx="2.5" fill="url(#enc-token-orange)" stroke="#fb6a00" stroke-width="1.6"/>
+            <rect x="1123.05" y="133.3" width="17.9" height="16.0" rx="1.5" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+        </g>
+        <g id="enc-target-state-row-2">
+          <g id="enc-target-state-row-2-1">
+            <rect x="1065.75" y="156" width="20.5" height="18.6" rx="2.5" fill="url(#enc-token-orange)" stroke="#fb6a00" stroke-width="1.6"/>
+            <rect x="1067.05" y="157.3" width="17.9" height="16.0" rx="1.5" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="enc-target-state-row-2-2">
+            <rect x="1093.75" y="156" width="20.5" height="18.6" rx="2.5" fill="url(#enc-token-orange)" stroke="#fb6a00" stroke-width="1.6"/>
+            <rect x="1095.05" y="157.3" width="17.9" height="16.0" rx="1.5" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="enc-target-state-row-2-3">
+            <rect x="1121.75" y="156" width="20.5" height="18.6" rx="2.5" fill="url(#enc-token-orange)" stroke="#fb6a00" stroke-width="1.6"/>
+            <rect x="1123.05" y="157.3" width="17.9" height="16.0" rx="1.5" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+        </g>
+        <text x="1104" y="200" font-size="19.5" font-weight="400" fill="#090b10" text-anchor="middle" id="enc-sample-target-caption">(target state tokens)</text>
+      </g>
+    </g>
+    <g id="enc-sample-to-shared-encoder-arrows">
+      <path d="M327 214 V232" fill="none" stroke="#007cff" stroke-width="3" id="enc-source-state-to-shared-encoders" marker-end="url(#enc-arrow-blue)" stroke-linejoin="round"/>
+      <path d="M532 214 V232" fill="none" stroke="#007cff" stroke-width="3" id="enc-action-to-shared-encoders" marker-end="url(#enc-arrow-blue)" stroke-linejoin="round"/>
+      <path d="M807 214 V232" fill="none" stroke="#007cff" stroke-width="3" id="enc-card-to-shared-encoders" marker-end="url(#enc-arrow-blue)" stroke-linejoin="round"/>
+      <path d="M1104 214 V232" fill="none" stroke="#ff7b08" stroke-width="2" id="enc-target-state-to-shared-encoders" marker-end="url(#enc-arrow-orange-small)" stroke-dasharray="5 4" stroke-linejoin="round"/>
+    </g>
+    <g id="enc-shared-feature-encoders">
+      <rect x="108.8" y="233.5" width="1231.2" height="208.8" rx="14" fill="url(#enc-panel-blue)" stroke="#119eff" stroke-width="2.3" id="enc-shared-encoders-background"/>
+      <text x="0" y="0" font-size="27" font-weight="700" fill="#0636a4" text-anchor="middle" id="enc-shared-encoders-title" transform="translate(727 260) scale(1.00359 1)">Shared Feature Encoders</text>
+      <g id="enc-state-encoder">
+        <rect x="121.8" y="269" width="485.9" height="163.2" rx="10" fill="#f3fbff" stroke="#32a9ff" stroke-width="1.2" fill-opacity="0.86"/>
+        <text x="0" y="0" font-size="25" font-weight="700" fill="#0636a4" text-anchor="middle" transform="translate(355.8 296) scale(0.96230 1)">State Encoder</text>
+        <text x="150" y="346" font-size="28" font-style="italic" font-weight="700" fill="#090b10" xml:space="preserve">s<tspan baseline-shift="sub" font-size="70%">t</tspan></text>
+        <path d="M178 335.5 H223.5" fill="none" stroke="#007cff" stroke-width="3" id="enc-state-input-arrow" marker-end="url(#enc-arrow-blue)" stroke-linejoin="round"/>
+        <text x="142.5" y="396" font-size="28" font-style="italic" font-weight="700" fill="#090b10" xml:space="preserve">s<tspan baseline-shift="sub" font-size="70%">t+1</tspan></text>
+        <path d="M178.5 384 H223.5" fill="none" stroke="#ff7b08" stroke-width="2.2" id="enc-next-state-input-arrow" marker-end="url(#enc-arrow-orange-small)" stroke-dasharray="6 4" stroke-linejoin="round"/>
+        <path d="M225.5 308 329.8 325 V385 L225.5 402Z" fill="url(#enc-block-blue)" stroke="#149dff" stroke-width="1.6" id="enc-state-encoder-shape"/>
+        <text x="278" y="350" font-size="18.5" font-weight="700" fill="#032c9b" text-anchor="middle">State</text>
+        <text x="278" y="370" font-size="18.5" font-weight="700" fill="#032c9b" text-anchor="middle">Encoder</text>
+        <text x="0" y="0" font-size="19" font-weight="400" fill="#090b10" text-anchor="middle" transform="translate(274 420) scale(0.98739 1)">shared weights</text>
+        <g id="enc-state-encoder-global-output">
+          <path d="M312 322 H370.5" fill="none" stroke="#007cff" stroke-width="3" id="enc-state-to-global-embedding" marker-end="url(#enc-arrow-blue)" stroke-linejoin="round"/>
+          <text x="379" y="328" font-size="28" font-style="italic" font-weight="700" fill="#090b10" xml:space="preserve">h<tspan baseline-shift="sub" font-size="70%">s</tspan></text>
+          <g id="enc-global-state-embedding">
+            <rect x="434.5" y="308.4" width="40" height="25" rx="3" fill="url(#enc-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="435.8" y="309.7" width="37.4" height="22.4" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <text x="0" y="0" font-size="18.5" font-weight="400" fill="#090b10" transform="translate(489.5 325) scale(0.93921 1)">(global)</text>
+        </g>
+        <g id="enc-state-encoder-token-output">
+          <path d="M330 359 H370.5" fill="none" stroke="#007cff" stroke-width="2.5" id="enc-state-to-token-sequence" marker-end="url(#enc-arrow-blue-small)" stroke-linejoin="round"/>
+          <text x="379" y="369" font-size="28" font-style="italic" font-weight="700" fill="#090b10" xml:space="preserve">H<tspan baseline-shift="sub" font-size="70%">s</tspan></text>
+          <g id="enc-entity-token-sequence">
+            <g id="enc-entity-token-sequence-1">
+              <rect x="434.5" y="347" width="19.5" height="24.5" rx="3" fill="url(#enc-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+              <rect x="435.8" y="348.3" width="16.9" height="21.9" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+            </g>
+            <g id="enc-entity-token-sequence-2">
+              <rect x="458.0" y="347" width="19.5" height="24.5" rx="3" fill="url(#enc-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+              <rect x="459.3" y="348.3" width="16.9" height="21.9" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+            </g>
+            <g id="enc-entity-token-sequence-3">
+              <rect x="481.5" y="347" width="19.5" height="24.5" rx="3" fill="url(#enc-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+              <rect x="482.8" y="348.3" width="16.9" height="21.9" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+            </g>
+            <g id="enc-entity-token-sequence-4">
+              <rect x="505.0" y="347" width="19.5" height="24.5" rx="3" fill="url(#enc-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+              <rect x="506.3" y="348.3" width="16.9" height="21.9" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+            </g>
+          </g>
+          <text x="0" y="0" font-size="18.5" font-weight="400" fill="#090b10" transform="translate(535.5 365) scale(1.00627 1)">(tokens)</text>
+        </g>
+        <g id="enc-state-encoder-next-state-output">
+          <path d="M310 388.5 V402.5 H370.5" fill="none" stroke="#ff7b08" stroke-width="2.2" id="enc-state-to-next-state-embedding" marker-end="url(#enc-arrow-orange-small)" stroke-dasharray="6 4" stroke-linejoin="round"/>
+          <text x="379" y="412" font-size="28" font-style="italic" font-weight="700" fill="#090b10" xml:space="preserve">h<tspan baseline-shift="sub" font-size="70%">t+1</tspan></text>
+          <g id="enc-next-state-embedding">
+            <rect x="434.5" y="390.5" width="40" height="24" rx="3" fill="url(#enc-token-orange)" stroke="#fb6a00" stroke-width="1.6"/>
+            <rect x="435.8" y="391.8" width="37.4" height="21.4" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <text x="0" y="0" font-size="18.5" font-weight="400" fill="#090b10" transform="translate(489.5 408) scale(1.03289 1)">(next-state)</text>
+        </g>
+      </g>
+      <g id="enc-action-encoder">
+        <rect x="615.5" y="269" width="311.5" height="163.2" rx="10" fill="#f3fbff" stroke="#32a9ff" stroke-width="1.2" fill-opacity="0.86"/>
+        <text x="0" y="0" font-size="25" font-weight="700" fill="#0636a4" text-anchor="middle" transform="translate(771.5 296) scale(0.96206 1)">Action Encoder</text>
+        <text x="631.5" y="369" font-size="28" font-style="italic" font-weight="700" fill="#090b10" xml:space="preserve">a<tspan baseline-shift="sub" font-size="70%">t</tspan></text>
+        <path d="M663 361.5 H691.5" fill="none" stroke="#007cff" stroke-width="3" id="enc-discrete-action-to-encoder" marker-end="url(#enc-arrow-blue)" stroke-linejoin="round"/>
+        <path d="M693 317 787.5 333 V388.5 L693 405Z" fill="url(#enc-block-blue)" stroke="#149dff" stroke-width="1.6" id="enc-action-encoder-shape"/>
+        <text x="741" y="354" font-size="18.5" font-weight="700" fill="#032c9b" text-anchor="middle">Action</text>
+        <text x="741" y="374" font-size="18.5" font-weight="700" fill="#032c9b" text-anchor="middle">Encoder</text>
+        <path d="M792 361.5 H834" fill="none" stroke="#007cff" stroke-width="3" id="enc-encoder-to-action-embedding" marker-end="url(#enc-arrow-blue)" stroke-linejoin="round"/>
+        <text x="841.5" y="347" font-size="26" font-style="italic" font-weight="700" fill="#090b10" xml:space="preserve">h<tspan baseline-shift="sub" font-size="70%"><tspan font-style="normal">action</tspan></tspan></text>
+        <g id="enc-action-embedding">
+          <rect x="844.5" y="356.2" width="57.5" height="23.5" rx="3" fill="url(#enc-token-green)" stroke="#217a1d" stroke-width="1.6"/>
+          <rect x="845.8" y="357.5" width="54.9" height="20.9" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+        </g>
+      </g>
+      <g id="enc-card-fusion">
+        <rect x="935.8" y="269" width="392" height="163.2" rx="10" fill="#f3fbff" stroke="#32a9ff" stroke-width="1.2" fill-opacity="0.86"/>
+        <text x="0" y="0" font-size="25" font-weight="700" fill="#0636a4" text-anchor="middle" transform="translate(1133 296) scale(0.93249 1)">Card Fusion</text>
+        <text x="952.5" y="369" font-size="28" font-style="italic" font-weight="700" fill="#090b10" xml:space="preserve">c<tspan baseline-shift="sub" font-size="70%">t</tspan></text>
+        <path d="M980 361.5 H1000.5 V335 H1026.5" fill="none" stroke="#007cff" stroke-width="2.5" id="enc-card-to-text-encoder" marker-end="url(#enc-arrow-blue-small)" stroke-linejoin="round"/>
+        <path d="M1000.5 361.5 V387.8 H1026.5" fill="none" stroke="#007cff" stroke-width="2.5" id="enc-card-to-attribute-encoder" marker-end="url(#enc-arrow-blue-small)" stroke-linejoin="round"/>
+        <rect x="1027.5" y="314.5" width="149.5" height="41.5" rx="5" fill="url(#enc-block-blue)" stroke="#149dff" stroke-width="1.4" id="enc-card-text-encoder"/>
+        <text x="0" y="0" font-size="19" font-weight="700" fill="#032c9b" text-anchor="middle" transform="translate(1102.2 340.5) scale(0.94329 1)">Text Encoder</text>
+        <rect x="1027.5" y="367" width="149.5" height="41.4" rx="5" fill="url(#enc-block-blue)" stroke="#149dff" stroke-width="1.4" id="enc-card-attribute-encoder"/>
+        <text x="0" y="0" font-size="18.5" font-weight="400" fill="#090b10" text-anchor="middle" transform="translate(1102.2 392) scale(0.95453 1)">Attribute Encoder</text>
+        <path d="M1177.5 335 H1183.5 L1186.5 330.8 H1208.5 V350.5" fill="none" stroke="#007cff" stroke-width="2.5" id="enc-text-embedding-to-card-sum" marker-end="url(#enc-arrow-blue-small)" stroke-linejoin="round"/>
+        <path d="M1177.5 387.7 H1182 L1187 391.5 H1208.5 V373" fill="none" stroke="#007cff" stroke-width="2.5" id="enc-attribute-embedding-to-card-sum" marker-end="url(#enc-arrow-blue-small)" stroke-linejoin="round"/>
+        <circle id="enc-card-feature-sum" cx="1208.5" cy="361.5" r="10.6" fill="#eefaff" stroke="#007aff" stroke-width="2"/>
+        <path d="M1202.5 361.5 H1214.5 M1208.5 355.5 V367.5" fill="none" stroke="#007aff" stroke-width="2"/>
+        <path d="M1223 361.5 H1245.5" fill="none" stroke="#007cff" stroke-width="2.6" id="enc-sum-to-card-embedding" marker-end="url(#enc-arrow-blue-small)" stroke-linejoin="round"/>
+        <text x="1253.5" y="345" font-size="26" font-style="italic" font-weight="700" fill="#090b10" xml:space="preserve">h<tspan baseline-shift="sub" font-size="70%"><tspan font-style="normal">card</tspan></tspan></text>
+        <g id="enc-card-embedding">
+          <rect x="1253.5" y="356" width="52.5" height="24" rx="3" fill="url(#enc-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+          <rect x="1254.8" y="357.3" width="49.9" height="21.4" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+        </g>
+      </g>
+    </g>
+    <g id="enc-conditioning-and-output-connections">
+      <g id="enc-conditioning-routes">
+        <path d="M724 444 V473.2" fill="none" stroke="#007cff" stroke-width="2.8" id="enc-shared-encoders-to-conditioning" marker-end="url(#enc-arrow-blue)" stroke-linejoin="round"/>
+        <path d="M899 498.5 H1172 Q1180 498.5 1180 506.5 V616.5" fill="none" stroke="#007cff" stroke-width="2.8" id="enc-conditioning-to-planner" marker-end="url(#enc-arrow-blue)" stroke-linejoin="round"/>
+        <path d="M582.2 522 V559.5" fill="none" stroke="#007cff" stroke-width="2.8" id="enc-conditioning-to-prior" marker-end="url(#enc-arrow-blue)" stroke-linejoin="round"/>
+        <path d="M886 522 V559.5" fill="none" stroke="#007cff" stroke-width="2.8" id="enc-conditioning-to-posterior" marker-end="url(#enc-arrow-blue)" stroke-linejoin="round"/>
+        <text x="1159" y="577" font-size="23" font-style="italic" font-weight="700" text-anchor="end" fill="#0636a4" id="enc-planner-conditioning-route-label" xml:space="preserve">C</text>
+      </g>
+      <g id="enc-source-token-bypass-routes">
+        <path d="M327.5 444 V924" fill="none" stroke="#007cff" stroke-width="2.8" id="enc-source-state-to-decoder-output" marker-end="url(#enc-arrow-blue)" stroke-linejoin="round"/>
+        <text x="305" y="477" font-size="25" font-style="italic" font-weight="700" text-anchor="end" fill="#0636a4" id="enc-decoder-source-token-route-label" xml:space="preserve">H<tspan baseline-shift="sub" font-size="70%">s</tspan></text>
+        <path d="M1280 444 V616.5" fill="none" stroke="#007cff" stroke-width="2.8" id="enc-source-state-to-planner" marker-end="url(#enc-arrow-blue)" stroke-linejoin="round"/>
+        <text x="1300" y="477" font-size="25" font-style="italic" font-weight="700" fill="#0636a4" id="enc-planner-source-token-route-label" xml:space="preserve">H<tspan baseline-shift="sub" font-size="70%">s</tspan></text>
+      </g>
+      <g id="enc-next-state-supervision-route">
+        <path d="M982 491.5 V505.5" fill="none" stroke="#ffffff" stroke-width="8" id="enc-next-state-crossing-clearance" stroke-linecap="round"/>
+        <path d="M982 444 V559.5" fill="none" stroke="#ff7b08" stroke-width="2.5" id="enc-next-state-to-posterior" marker-end="url(#enc-arrow-orange-small)" stroke-dasharray="6 4" stroke-linejoin="round"/>
+        <text x="1001" y="477" font-size="25" font-style="italic" font-weight="700" fill="#e96709" id="enc-posterior-next-state-route-label" xml:space="preserve">h<tspan baseline-shift="sub" font-size="70%">t+1</tspan></text>
+      </g>
+      <g id="enc-shared-encoder-output-ports">
+        <circle id="enc-shared-output-port-source-tokens-decoder" cx="327.5" cy="442.3" r="3.2" fill="#ffffff" stroke="#007cff" stroke-width="2"/>
+        <circle id="enc-shared-output-port-conditioning" cx="724" cy="442.3" r="3.2" fill="#ffffff" stroke="#007cff" stroke-width="2"/>
+        <circle id="enc-shared-output-port-next-state" cx="982" cy="442.3" r="3.2" fill="#ffffff" stroke="#ff7b08" stroke-width="2"/>
+        <circle id="enc-shared-output-port-source-tokens-planner" cx="1280" cy="442.3" r="3.2" fill="#ffffff" stroke="#007cff" stroke-width="2"/>
+      </g>
+    </g>
+    <g id="enc-conditioning-vector">
+      <rect x="550" y="475" width="348.5" height="47" rx="13" fill="url(#enc-block-blue)" stroke="#0780ff" stroke-width="2.5"/>
+      <text x="724.5" y="507" font-size="29" font-style="italic" font-weight="700" text-anchor="middle" fill="#090b10" xml:space="preserve">C<tspan font-style="normal"> = [</tspan>h<tspan baseline-shift="sub" font-size="70%"><tspan font-style="normal">card</tspan></tspan><tspan font-style="normal">, </tspan>h<tspan baseline-shift="sub" font-size="70%"><tspan font-style="normal">action</tspan></tspan><tspan font-style="normal">, </tspan>h<tspan baseline-shift="sub" font-size="70%">s</tspan><tspan font-style="normal">]</tspan></text>
+    </g>
+    <g id="enc-prior-encoder">
+      <rect x="417.8" y="560.8" width="272.4" height="121.5" rx="12" fill="url(#enc-panel-green)" stroke="#159a29" stroke-width="2"/>
+      <rect x="423" y="597" width="262" height="80" rx="11" fill="#f9fff9" fill-opacity="0.75"/>
+      <text x="0" y="0" font-size="26" font-weight="700" fill="#07630a" text-anchor="middle" transform="translate(554.3 588.5) scale(0.88999 1)">Prior Encoder</text>
+      <text x="460" y="644" font-size="28" font-style="italic" font-weight="700" fill="#090b10" xml:space="preserve">C</text>
+      <path d="M485 636.7 H525.5" fill="none" stroke="#050808" stroke-width="2.2" id="enc-condition-to-prior-encoder" marker-end="url(#enc-arrow-black)" stroke-linejoin="round"/>
+      <path d="M527.7 600.5 641.5 616 V659.5 L527.7 675Z" fill="url(#enc-block-green)" stroke="#178826" stroke-width="1.5" id="enc-prior-encoder-shape"/>
+      <text x="585" y="631.5" font-size="21" font-weight="400" fill="#090b10" text-anchor="middle">Prior</text>
+      <text x="585" y="653" font-size="21" font-weight="400" fill="#090b10" text-anchor="middle">Encoder</text>
+      <path d="M528 682.5 V704" fill="none" stroke="#0c8819" stroke-width="2.5" id="enc-prior-encoder-to-distribution" marker-end="url(#enc-arrow-green)" stroke-linejoin="round"/>
+    </g>
+    <g id="enc-prior-distribution">
+      <rect x="431.5" y="706" width="194" height="86.5" rx="7" fill="url(#enc-panel-green)" stroke="#129b24" stroke-width="1.8"/>
+      <g id="enc-prior-density">
+        <path d="M458 775 C475 775 477 765 484 744 C489 730 492 722.5 498 722.5 C504 722.5 507 735 512 747 C520 774 527 775 537 775 L458 775Z" fill="#b6dfaa" fill-opacity="0.42"/>
+        <path d="M458 775 C475 775 477 765 484 744 C489 730 492 722.5 498 722.5 C504 722.5 507 735 512 747 C520 774 527 775 537 775" fill="none" stroke="#12850e" stroke-width="2.5" stroke-linecap="round"/>
+      </g>
+      <line x1="498" y1="762" x2="498" y2="775" stroke="#229b24" stroke-width="1.4" id="enc-prior-mean-guide" stroke-dasharray="4 3"/>
+      <line x1="489" y1="775" x2="508" y2="775" stroke="#229b24" stroke-width="1.4"/>
+      <text x="573" y="736" font-size="24" font-style="italic" font-weight="700" text-anchor="middle" fill="#090b10" xml:space="preserve">p<tspan font-style="normal">(</tspan>z<tspan font-style="normal"> | </tspan>C<tspan font-style="normal">)</tspan></text>
+      <text x="578" y="770" font-size="25" font-style="italic" font-weight="400" text-anchor="middle" fill="#090b10" xml:space="preserve">μ<tspan baseline-shift="sub" font-size="70%">p</tspan><tspan font-style="normal">, </tspan>σ<tspan baseline-shift="sub" font-size="70%">p</tspan></text>
+      <text x="0" y="0" font-size="20" font-weight="700" fill="#08750a" id="enc-prior-inference-label" transform="translate(441 817) scale(0.96653 1)">inference prior</text>
+    </g>
+    <g id="enc-posterior-encoder">
+      <rect x="742.5" y="528" width="128" height="43" rx="10" fill="#ff6b00" id="enc-training-only-badge"/>
+      <text x="0" y="0" font-size="22" font-weight="400" fill="#ffffff" text-anchor="middle" transform="translate(806.5 550) scale(1.03512 1)">training only</text>
+      <rect x="742.5" y="560.8" width="320" height="121.5" rx="12" fill="url(#enc-panel-orange)" stroke="#ff6c0c" stroke-width="2"/>
+      <rect x="746" y="597" width="313" height="79" rx="12" fill="#fffaf5" fill-opacity="0.84"/>
+      <text x="0" y="0" font-size="26" font-weight="700" fill="#f15c00" text-anchor="middle" transform="translate(904 588.5) scale(0.94641 1)">Posterior Encoder</text>
+      <text x="767" y="644" font-size="28" font-style="italic" font-weight="700" fill="#090b10" xml:space="preserve">C<tspan font-style="normal"> + </tspan>h<tspan baseline-shift="sub" font-size="70%">t+1</tspan></text>
+      <path d="M866 636.5 H909" fill="none" stroke="#050808" stroke-width="2.3" id="enc-condition-and-next-state-to-posterior" marker-end="url(#enc-arrow-black)" stroke-linejoin="round"/>
+      <path d="M911.7 600.5 1026.2 616 V659.5 L911.7 675Z" fill="url(#enc-block-orange)" stroke="#ff700c" stroke-width="1.5" id="enc-posterior-encoder-shape"/>
+      <text x="969" y="631.5" font-size="21" font-weight="400" fill="#090b10" text-anchor="middle">Posterior</text>
+      <text x="969" y="653" font-size="21" font-weight="400" fill="#090b10" text-anchor="middle">Encoder</text>
+      <path d="M940.2 682.5 V704.5" fill="none" stroke="#ff7b08" stroke-width="2.8" id="enc-posterior-encoder-to-distribution" marker-end="url(#enc-arrow-orange)" stroke-linejoin="round"/>
+    </g>
+    <g id="enc-posterior-distribution">
+      <rect x="842.4" y="706" width="199.2" height="86.5" rx="7" fill="#fff3e7" stroke="#ff730d" stroke-width="1.8"/>
+      <g id="enc-posterior-density-left">
+        <path d="M857 777 C873 777 876 768 882 746 C886 731 888 724 892.5 724 C898 724 900 740 906 756 C910 770 916 777 928 777 L857 777Z" fill="#ffd1a5" fill-opacity="0.42"/>
+        <path d="M857 777 C873 777 876 768 882 746 C886 731 888 724 892.5 724 C898 724 900 740 906 756 C910 770 916 777 928 777" fill="none" stroke="#ff6800" stroke-width="2.5" stroke-linecap="round"/>
+      </g>
+      <path d="M865 777 C880 777 884 765 889 746 C893 730 895 724 900 724 C906 724 909 744 915 759 C921 775 927 777 935 777" fill="none" stroke="#ff6800" stroke-width="2.2" id="enc-posterior-density-right" stroke-linecap="round"/>
+      <text x="0" y="0" font-size="23.5" font-style="italic" font-weight="400" fill="#090b10" xml:space="preserve" transform="translate(923.5 739) scale(0.95 1)">q<tspan font-style="normal">(</tspan>z<tspan font-style="normal"> | </tspan>C<tspan font-style="normal">, </tspan>h<tspan baseline-shift="sub" font-size="70%">t+1</tspan><tspan font-style="normal">)</tspan></text>
+      <text x="982" y="770" font-size="25" font-style="italic" font-weight="400" text-anchor="middle" fill="#090b10" xml:space="preserve">μ<tspan baseline-shift="sub" font-size="70%">q</tspan><tspan font-style="normal">, </tspan>σ<tspan baseline-shift="sub" font-size="70%">q</tspan></text>
+    </g>
+    <g id="enc-latent-connections">
+      <path d="M582 793 V815.8 H653.8" fill="none" stroke="#7d29d0" stroke-width="3.3" id="enc-prior-to-kl" marker-end="url(#enc-arrow-purple)" stroke-linejoin="round"/>
+      <path d="M883.5 793 V815.8 H820.5" fill="none" stroke="#7d29d0" stroke-width="3.3" id="enc-posterior-to-kl" marker-end="url(#enc-arrow-purple)" stroke-linejoin="round"/>
+      <path d="M940.3 793 V836.5" fill="none" stroke="#7d29d0" stroke-width="3.2" id="enc-posterior-to-latent-sample" marker-end="url(#enc-arrow-purple)" stroke-linejoin="round"/>
+      <path d="M940.85 883.5 V923.5" fill="none" stroke="#7d29d0" stroke-width="3.3" id="enc-latent-sample-to-decoder-output" marker-end="url(#enc-arrow-purple)" stroke-linejoin="round"/>
+    </g>
+    <g id="enc-kl-divergence">
+      <rect x="655.2" y="749.2" width="163.8" height="115" rx="10" fill="url(#enc-panel-purple)" stroke="#862bd6" stroke-width="2.4"/>
+      <rect x="659" y="786.5" width="155.5" height="73" rx="10" fill="#fcf8ff" fill-opacity="0.85"/>
+      <text x="737" y="777" font-size="26" font-style="italic" font-weight="700" text-anchor="middle" fill="#090b10" xml:space="preserve"><tspan font-style="normal" fill="#6716a8">KL</tspan><tspan font-style="normal">(</tspan>q<tspan font-style="normal"> || </tspan>p<tspan font-style="normal">)</tspan></text>
+      <text x="718.5" y="807" font-size="22" font-weight="700" font-style="italic" fill="#ff6800" text-anchor="middle">q</text>
+      <text x="762.5" y="807" font-size="22" font-weight="700" font-style="italic" fill="#087a0a" text-anchor="middle">p</text>
+      <g id="enc-kl-posterior-density">
+        <path d="M678 854 C703 854 698 817.5 718.5 817.5 C739 817.5 733 854 769 854 L678 854Z" fill="#ffdfbb" fill-opacity="0.42"/>
+        <path d="M678 854 C703 854 698 817.5 718.5 817.5 C739 817.5 733 854 769 854" fill="none" stroke="#ff6a00" stroke-width="2.5" stroke-linecap="round"/>
+      </g>
+      <g id="enc-kl-prior-density">
+        <path d="M709 854 C742 854 735 817.5 758.5 817.5 C781 817.5 775 854 799 854 L709 854Z" fill="#cde8c5" fill-opacity="0.42"/>
+        <path d="M709 854 C742 854 735 817.5 758.5 817.5 C781 817.5 775 854 799 854" fill="none" stroke="#138613" stroke-width="2.5" stroke-linecap="round"/>
+      </g>
+    </g>
+    <g id="enc-reparameterized-latent">
+      <rect x="900.6" y="838.5" width="80.5" height="44.3" rx="7" fill="url(#enc-panel-purple)" stroke="#7b25d0" stroke-width="2.5" id="enc-sampled-latent-box"/>
+      <text x="940.85" y="867" font-size="28" font-style="italic" font-weight="700" text-anchor="middle" fill="#090b10" xml:space="preserve">z<tspan baseline-shift="sub" font-size="70%">q</tspan></text>
+      <text x="0" y="0" font-size="18.5" font-weight="400" fill="#7821cf" id="enc-reparameterization-label" transform="translate(993 852) scale(1.01618 1)">reparameterized sample</text>
+      <text x="996" y="876" font-size="25" font-style="italic" font-weight="400" fill="#090b10" id="enc-reparameterization-equation" xml:space="preserve">z<tspan baseline-shift="sub" font-size="70%">q</tspan><tspan font-style="normal"> = </tspan>μ<tspan baseline-shift="sub" font-size="70%">q</tspan><tspan font-style="normal"> + </tspan>σ<tspan baseline-shift="sub" font-size="70%">q</tspan><tspan font-style="normal"> ⊙ </tspan>ε</text>
+    </g>
+    <g id="enc-transition-planner">
+      <rect x="1088" y="618.3" width="255.8" height="193.7" rx="14" fill="url(#enc-panel-blue)" stroke="#108aff" stroke-width="2.5"/>
+      <rect x="1094.3" y="661" width="243" height="143.5" rx="13" fill="#f4fcff" fill-opacity="0.9"/>
+      <text x="0" y="0" font-size="26" font-weight="700" fill="#0431a0" text-anchor="middle" transform="translate(1215 648) scale(0.92632 1)">Transition Planner</text>
+      <text x="1211" y="692" font-size="29" font-style="italic" font-weight="700" text-anchor="middle" fill="#090b10" xml:space="preserve">C<tspan font-style="normal"> + </tspan>H<tspan baseline-shift="sub" font-size="70%">s</tspan></text>
+      <g id="enc-planner-tokens">
+        <g id="enc-planner-tokens-1">
+          <rect x="1135.5" y="711.5" width="28.5" height="35" rx="4" fill="url(#enc-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+          <rect x="1136.8" y="712.8" width="25.9" height="32.4" rx="3" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+        </g>
+        <g id="enc-planner-tokens-2">
+          <rect x="1168.8" y="711.5" width="28.5" height="35" rx="4" fill="url(#enc-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+          <rect x="1170.1" y="712.8" width="25.9" height="32.4" rx="3" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+        </g>
+        <g id="enc-planner-tokens-3">
+          <rect x="1202.1" y="711.5" width="28.5" height="35" rx="4" fill="url(#enc-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+          <rect x="1203.4" y="712.8" width="25.9" height="32.4" rx="3" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+        </g>
+        <g id="enc-planner-tokens-4">
+          <rect x="1235.4" y="711.5" width="28.5" height="35" rx="4" fill="url(#enc-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+          <rect x="1236.7" y="712.8" width="25.9" height="32.4" rx="3" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+        </g>
+      </g>
+      <text x="1285" y="738" font-size="30" font-style="italic" font-weight="700" fill="#090b10" xml:space="preserve">P</text>
+      <text x="0" y="0" font-size="20" font-weight="400" fill="#090b10" text-anchor="middle" transform="translate(1200 769) scale(1.00319 1)">4 plan tokens</text>
+      <text x="0" y="0" font-size="20" font-weight="400" fill="#090b10" text-anchor="middle" transform="translate(1200 794) scale(1.07239 1)">deterministic</text>
+      <path d="M1207.5 812 V924.5" fill="none" stroke="#007cff" stroke-width="3.3" id="enc-planner-to-decoder-output" marker-end="url(#enc-arrow-blue)" stroke-linejoin="round"/>
+    </g>
+    <g id="enc-decoder-stage-outputs">
+      <rect x="117.9" y="925.5" width="1212" height="122.2" rx="13" fill="url(#enc-panel-neutral)" stroke="#7f929f" stroke-width="2.4" id="enc-decoder-outputs-background"/>
+      <rect x="128.2" y="960.5" width="1191.4" height="79" rx="13" fill="#f8fcff" fill-opacity="0.87"/>
+      <text x="0" y="0" font-size="26" font-weight="700" fill="#090b10" text-anchor="middle" id="enc-decoder-outputs-title" transform="translate(724 953) scale(0.98159 1)">Outputs to Decoder Stage</text>
+      <line x1="523.5" y1="974" x2="523.5" y2="1027" stroke="#91a6b4" stroke-width="1.3"/>
+      <line x1="923.5" y1="974" x2="923.5" y2="1027" stroke="#91a6b4" stroke-width="1.3"/>
+      <g id="enc-decoder-source-state">
+        <text x="199" y="1009" font-size="30" font-style="italic" font-weight="700" fill="#090b10" xml:space="preserve">H<tspan baseline-shift="sub" font-size="70%">s</tspan></text>
+        <g id="enc-decoder-source-state-tokens">
+          <g id="enc-decoder-source-state-tokens-1">
+            <rect x="268.0" y="969" width="32" height="36.5" rx="4" fill="url(#enc-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="269.3" y="970.3" width="29.4" height="33.9" rx="3" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="enc-decoder-source-state-tokens-2">
+            <rect x="306.4" y="969" width="32" height="36.5" rx="4" fill="url(#enc-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="307.7" y="970.3" width="29.4" height="33.9" rx="3" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="enc-decoder-source-state-tokens-3">
+            <rect x="344.8" y="969" width="32" height="36.5" rx="4" fill="url(#enc-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="346.1" y="970.3" width="29.4" height="33.9" rx="3" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="enc-decoder-source-state-tokens-4">
+            <rect x="383.2" y="969" width="32" height="36.5" rx="4" fill="url(#enc-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="384.5" y="970.3" width="29.4" height="33.9" rx="3" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+        </g>
+        <text x="0" y="0" font-size="21" font-weight="400" fill="#090b10" text-anchor="middle" transform="translate(344.5 1030) scale(1.04885 1)">(source state tokens)</text>
+      </g>
+      <g id="enc-decoder-stochastic-latent">
+        <text x="635" y="1005" font-size="30" font-style="italic" font-weight="700" fill="#090b10" xml:space="preserve">z<tspan baseline-shift="sub" font-size="70%">q</tspan></text>
+        <g id="enc-decoder-latent-token">
+          <rect x="720.5" y="973.5" width="54.5" height="32.2" rx="3" fill="url(#enc-token-purple)" stroke="#7f25d8" stroke-width="1.6"/>
+          <rect x="721.8" y="974.8" width="51.9" height="29.6" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+        </g>
+        <text x="0" y="0" font-size="21" font-weight="400" fill="#090b10" text-anchor="middle" transform="translate(754 1030) scale(1.02926 1)">(stochastic latent)</text>
+      </g>
+      <g id="enc-decoder-plan">
+        <text x="1026" y="1009" font-size="30" font-style="italic" font-weight="700" fill="#090b10" xml:space="preserve">P</text>
+        <g id="enc-decoder-plan-tokens">
+          <g id="enc-decoder-plan-tokens-1">
+            <rect x="1081.4" y="969" width="31.5" height="36.5" rx="4" fill="url(#enc-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="1082.7" y="970.3" width="28.9" height="33.9" rx="3" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="enc-decoder-plan-tokens-2">
+            <rect x="1119.8" y="969" width="31.5" height="36.5" rx="4" fill="url(#enc-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="1121.1" y="970.3" width="28.9" height="33.9" rx="3" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="enc-decoder-plan-tokens-3">
+            <rect x="1158.2" y="969" width="31.5" height="36.5" rx="4" fill="url(#enc-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="1159.5" y="970.3" width="28.9" height="33.9" rx="3" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="enc-decoder-plan-tokens-4">
+            <rect x="1196.6" y="969" width="31.5" height="36.5" rx="4" fill="url(#enc-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="1197.9" y="970.3" width="28.9" height="33.9" rx="3" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+        </g>
+        <text x="0" y="0" font-size="21" font-weight="400" fill="#090b10" text-anchor="middle" transform="translate(1153 1030) scale(1.00726 1)">(plan tokens)</text>
+      </g>
+    </g>
+    <g id="enc-model-dimensions">
+      <text x="724" y="1072" text-anchor="middle" font-size="17.5" fill="#090b10"><tspan font-style="italic">d</tspan><tspan> = 128 · latent dim = 32 · plan tokens = 4 · shared state encoder</tspan></text>
+    </g>
+  </g>
+  <g id="panel-b-entity-decoder" transform="translate(1717 190)">
+    <title>Decoder Stage: Plan-Conditioned Entity State Generation</title>
+    <text x="0" y="0" font-size="36" font-weight="700" fill="#090b10" id="dec-title" transform="translate(294 35) scale(0.96634 1)">Decoder Stage: Plan-Conditioned Entity State Generation</text>
+    <g id="dec-encoder-stage-outputs">
+      <rect x="410.5" y="62.5" width="624" height="124" rx="9" fill="url(#dec-panel-blue)" stroke="#2589e6" stroke-width="2.4" id="dec-encoder-outputs-background"/>
+      <text x="0" y="0" font-size="26" font-weight="700" fill="#081441" text-anchor="middle" id="dec-encoder-outputs-title" transform="translate(722.5 89.5) scale(0.97421 1)">Encoder-Stage Outputs</text>
+      <g id="dec-source-entity-tokens">
+        <text x="516.5" y="113" font-size="22" font-style="italic" font-weight="700" text-anchor="middle" fill="#090b10" xml:space="preserve">H<tspan baseline-shift="-4.4" font-size="14.96">s</tspan></text>
+        <g id="dec-source-entity-token-prefix">
+          <g id="dec-source-entity-token-prefix-1">
+            <rect x="438.5" y="125.5" width="23.5" height="27.5" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="439.8" y="126.8" width="20.9" height="24.9" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="dec-source-entity-token-prefix-2">
+            <rect x="468.0" y="125.5" width="23.5" height="27.5" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="469.3" y="126.8" width="20.9" height="24.9" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="dec-source-entity-token-prefix-3">
+            <rect x="497.5" y="125.5" width="23.5" height="27.5" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="498.8" y="126.8" width="20.9" height="24.9" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+        </g>
+        <text x="547" y="146" font-size="29" font-weight="700" fill="#096ec8" text-anchor="middle">···</text>
+        <g id="dec-source-entity-token-last">
+          <rect x="572.7" y="125.5" width="23.5" height="27.5" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+          <rect x="574.0" y="126.8" width="20.9" height="24.9" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+        </g>
+        <text x="0" y="0" font-size="19.3" font-weight="400" fill="#090b10" text-anchor="middle" transform="translate(517.5 174) scale(0.99754 1)">source entity tokens</text>
+      </g>
+      <g id="dec-deterministic-plan">
+        <text x="716" y="113" font-size="22" font-style="italic" font-weight="700" text-anchor="middle" fill="#090b10" xml:space="preserve">P</text>
+        <g id="dec-input-plan-tokens">
+          <g id="dec-input-plan-tokens-1">
+            <rect x="655.5" y="125.5" width="24" height="27.5" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="656.8" y="126.8" width="21.4" height="24.9" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="dec-input-plan-tokens-2">
+            <rect x="686.5" y="125.5" width="24" height="27.5" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="687.8" y="126.8" width="21.4" height="24.9" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="dec-input-plan-tokens-3">
+            <rect x="717.5" y="125.5" width="24" height="27.5" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="718.8" y="126.8" width="21.4" height="24.9" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="dec-input-plan-tokens-4">
+            <rect x="748.5" y="125.5" width="24" height="27.5" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="749.8" y="126.8" width="21.4" height="24.9" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+        </g>
+        <text x="0" y="0" font-size="19.3" font-weight="400" fill="#090b10" text-anchor="middle" transform="translate(716 174) scale(1.01570 1)">deterministic plan</text>
+      </g>
+      <g id="dec-posterior-sample">
+        <text x="901.5" y="113" font-size="22" font-style="italic" font-weight="700" text-anchor="middle" fill="#090b10" xml:space="preserve">z<tspan baseline-shift="-4.4" font-size="14.96">q</tspan></text>
+        <circle id="dec-posterior-sample-node" cx="901.2" cy="139" r="14.7" fill="url(#dec-token-purple)" stroke="#793eb6" stroke-width="2"/>
+        <text x="0" y="0" font-size="19.3" font-weight="400" fill="#090b10" text-anchor="middle" transform="translate(901.5 174) scale(1.00695 1)">posterior sample</text>
+      </g>
+    </g>
+    <g id="dec-encoder-output-connections">
+      <path d="M516.5 186.5 V253 H353.5 V322" fill="none" stroke="#096ec8" stroke-width="2.8" id="dec-source-tokens-to-decoder-queries" marker-end="url(#dec-arrow-blue)" stroke-linejoin="round"/>
+      <path d="M714 186.5 V310.5" fill="none" stroke="#096ec8" stroke-width="3.7" id="dec-plan-to-memory-fusion" marker-end="url(#dec-arrow-blue)" stroke-linejoin="round"/>
+      <path d="M901.5 186.5 V217" fill="none" stroke="#7b3cb2" stroke-width="2.7" id="dec-posterior-sample-to-latent-memory" marker-end="url(#dec-arrow-purple)" stroke-linejoin="round"/>
+    </g>
+    <g id="dec-latent-memory">
+      <rect x="822.2" y="218.7" width="159.5" height="44" rx="6" fill="url(#dec-panel-purple)" stroke="#7f39b4" stroke-width="1.8" id="dec-latent-memory-block"/>
+      <text x="0" y="0" font-size="20" font-weight="700" fill="#081441" text-anchor="middle" transform="translate(901.8 246) scale(0.97066 1)">Latent Memory</text>
+      <path d="M982.5 243.5 H1014.5" fill="none" stroke="#7b3cb2" stroke-width="2.3" id="dec-latent-memory-to-tokens" marker-end="url(#dec-arrow-purple-small)" stroke-linejoin="round"/>
+      <text x="1046.5" y="223" font-size="22" font-style="italic" font-weight="700" text-anchor="middle" fill="#090b10" xml:space="preserve">M<tspan font-style="normal">(</tspan>z<tspan baseline-shift="-4.4" font-size="14.96">q</tspan><tspan font-style="normal">)</tspan></text>
+      <g id="dec-latent-transition-tokens">
+        <g id="dec-latent-transition-tokens-1">
+          <rect x="1019.5" y="235" width="24" height="27.5" rx="3" fill="url(#dec-token-purple)" stroke="#7f25d8" stroke-width="1.6"/>
+          <rect x="1020.8" y="236.3" width="21.4" height="24.9" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+        </g>
+        <g id="dec-latent-transition-tokens-2">
+          <rect x="1050.0" y="235" width="24" height="27.5" rx="3" fill="url(#dec-token-purple)" stroke="#7f25d8" stroke-width="1.6"/>
+          <rect x="1051.3" y="236.3" width="21.4" height="24.9" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+        </g>
+      </g>
+      <text x="0" y="0" font-size="18.5" font-weight="400" fill="#090b10" transform="translate(1018 285) scale(1.02422 1)">2 transition tokens</text>
+      <path d="M1056.8 291 V310.5" fill="none" stroke="#7b3cb2" stroke-width="2.5" id="dec-latent-tokens-to-memory-fusion" marker-end="url(#dec-arrow-purple-small)" stroke-linejoin="round"/>
+    </g>
+    <g id="dec-decoder-query-construction">
+      <rect x="130.8" y="323.5" width="444.5" height="106" rx="7.5" fill="url(#dec-panel-blue)" stroke="#2489e4" stroke-width="2.3" id="dec-query-construction-background"/>
+      <text x="353.5" y="353" font-size="25" font-style="italic" font-weight="700" text-anchor="middle" fill="#081441" xml:space="preserve">H<tspan baseline-shift="-5" font-size="17">s</tspan><tspan font-style="normal"> + </tspan>10 birth queries</text>
+      <g id="dec-source-token-queries">
+        <g id="dec-query-source-prefix">
+          <g id="dec-query-source-prefix-1">
+            <rect x="152.5" y="369" width="23" height="26" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="153.8" y="370.3" width="20.4" height="23.4" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="dec-query-source-prefix-2">
+            <rect x="180.5" y="369" width="23" height="26" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="181.8" y="370.3" width="20.4" height="23.4" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="dec-query-source-prefix-3">
+            <rect x="208.5" y="369" width="23" height="26" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="209.8" y="370.3" width="20.4" height="23.4" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+        </g>
+        <text x="255" y="389" font-size="26" font-weight="700" fill="#096ec8" text-anchor="middle">···</text>
+        <g id="dec-query-source-last">
+          <rect x="278" y="369" width="23" height="26" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+          <rect x="279.3" y="370.3" width="20.4" height="23.4" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+        </g>
+      </g>
+      <g id="dec-query-concatenation-symbol">
+        <line x1="319" y1="371" x2="319" y2="395" stroke="#67778a" stroke-width="1.5"/>
+        <line x1="328" y1="371" x2="328" y2="395" stroke="#67778a" stroke-width="1.5"/>
+      </g>
+      <g id="dec-birth-query-slots">
+        <g id="dec-birth-query-filled-prefix">
+          <g id="dec-birth-query-filled-prefix-1">
+            <rect x="346.8" y="371" width="18" height="23.8" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="348.1" y="372.3" width="15.4" height="21.2" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="dec-birth-query-filled-prefix-2">
+            <rect x="370.3" y="371" width="18" height="23.8" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="371.6" y="372.3" width="15.4" height="21.2" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="dec-birth-query-filled-prefix-3">
+            <rect x="393.8" y="371" width="18" height="23.8" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="395.1" y="372.3" width="15.4" height="21.2" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+        </g>
+        <g id="dec-birth-query-empty-prefix-1">
+          <rect x="416.8" y="371" width="17.5" height="23.8" rx="2" fill="#fff" stroke="#66758b" stroke-width="1.35"/>
+          <rect x="418.1" y="372.3" width="14.9" height="21.2" rx="1" fill="none" stroke="#d8e3ef" stroke-width="0.65"/>
+        </g>
+        <g id="dec-birth-query-empty-prefix-2">
+          <rect x="440.3" y="371" width="17.5" height="23.8" rx="2" fill="#fff" stroke="#66758b" stroke-width="1.35"/>
+          <rect x="441.6" y="372.3" width="14.9" height="21.2" rx="1" fill="none" stroke="#d8e3ef" stroke-width="0.65"/>
+        </g>
+        <g id="dec-birth-query-empty-prefix-3">
+          <rect x="463.8" y="371" width="17.5" height="23.8" rx="2" fill="#fff" stroke="#66758b" stroke-width="1.35"/>
+          <rect x="465.1" y="372.3" width="14.9" height="21.2" rx="1" fill="none" stroke="#d8e3ef" stroke-width="0.65"/>
+        </g>
+        <text x="498" y="390" font-size="23" font-weight="700" fill="#4c5969" text-anchor="middle">···</text>
+        <g id="dec-birth-query-empty-suffix-1">
+          <rect x="516.8" y="371" width="17.5" height="23.8" rx="2" fill="#fff" stroke="#66758b" stroke-width="1.35"/>
+          <rect x="518.1" y="372.3" width="14.9" height="21.2" rx="1" fill="none" stroke="#d8e3ef" stroke-width="0.65"/>
+        </g>
+        <g id="dec-birth-query-empty-suffix-2">
+          <rect x="540.3" y="371" width="17.5" height="23.8" rx="2" fill="#fff" stroke="#66758b" stroke-width="1.35"/>
+          <rect x="541.6" y="372.3" width="14.9" height="21.2" rx="1" fill="none" stroke="#d8e3ef" stroke-width="0.65"/>
+        </g>
+      </g>
+      <text x="0" y="0" font-size="20" font-weight="400" fill="#090b10" text-anchor="middle" transform="translate(353.5 420) scale(1.05505 1)">decoder queries</text>
+      <path d="M433 430 V480" fill="none" stroke="#096ec8" stroke-width="3.5" id="dec-constructed-queries-to-entity-decoder" marker-end="url(#dec-arrow-blue)" stroke-linejoin="round"/>
+    </g>
+    <g id="dec-memory-fusion">
+      <rect x="614.3" y="312.2" width="536.6" height="138.3" rx="6" fill="url(#dec-fusion-blue)" stroke="#4b68df" stroke-width="2.4" id="dec-memory-fusion-background"/>
+      <text x="0" y="0" font-size="29" font-weight="700" fill="#081441" text-anchor="middle" transform="translate(863 340) scale(1.00334 1)">Memory Fusion</text>
+      <g id="dec-fusion-plan-input">
+        <text x="692" y="362" font-size="21" font-style="italic" font-weight="700" text-anchor="middle" fill="#090b10" xml:space="preserve">P</text>
+        <g id="dec-fusion-plan-tokens">
+          <g id="dec-fusion-plan-tokens-1">
+            <rect x="634.5" y="374.5" width="23" height="27" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="635.8" y="375.8" width="20.4" height="24.4" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="dec-fusion-plan-tokens-2">
+            <rect x="663.0" y="374.5" width="23" height="27" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="664.3" y="375.8" width="20.4" height="24.4" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="dec-fusion-plan-tokens-3">
+            <rect x="691.5" y="374.5" width="23" height="27" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="692.8" y="375.8" width="20.4" height="24.4" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="dec-fusion-plan-tokens-4">
+            <rect x="720.0" y="374.5" width="23" height="27" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="721.3" y="375.8" width="20.4" height="24.4" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+        </g>
+      </g>
+      <g id="dec-memory-concatenation-symbol">
+        <line x1="773" y1="376" x2="773" y2="402" stroke="#67778a" stroke-width="1.5"/>
+        <line x1="782" y1="376" x2="782" y2="402" stroke="#67778a" stroke-width="1.5"/>
+      </g>
+      <g id="dec-fusion-latent-input">
+        <text x="841" y="370" font-size="23" font-style="italic" font-weight="700" text-anchor="middle" fill="#090b10" xml:space="preserve">M<tspan font-style="normal">(</tspan>z<tspan baseline-shift="-4.6" font-size="15.64">q</tspan><tspan font-style="normal">)</tspan></text>
+        <g id="dec-fusion-latent-tokens">
+          <g id="dec-fusion-latent-tokens-1">
+            <rect x="814.5" y="383" width="24" height="27.5" rx="3" fill="url(#dec-token-purple)" stroke="#7f25d8" stroke-width="1.6"/>
+            <rect x="815.8" y="384.3" width="21.4" height="24.9" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="dec-fusion-latent-tokens-2">
+            <rect x="844.5" y="383" width="24" height="27.5" rx="3" fill="url(#dec-token-purple)" stroke="#7f25d8" stroke-width="1.6"/>
+            <rect x="845.8" y="384.3" width="21.4" height="24.9" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+        </g>
+      </g>
+      <path d="M897.5 384 H938" fill="none" stroke="#7b3cb2" stroke-width="2.8" id="dec-concatenate-plan-and-latent" marker-end="url(#dec-arrow-purple)" stroke-linejoin="round"/>
+      <g id="dec-fused-decoder-memory">
+        <g id="dec-fused-plan-tokens">
+          <g id="dec-fused-plan-tokens-1">
+            <rect x="954.0" y="361.5" width="23.5" height="27" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="955.3" y="362.8" width="20.9" height="24.4" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="dec-fused-plan-tokens-2">
+            <rect x="982.5" y="361.5" width="23.5" height="27" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="983.8" y="362.8" width="20.9" height="24.4" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="dec-fused-plan-tokens-3">
+            <rect x="1011.0" y="361.5" width="23.5" height="27" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="1012.3" y="362.8" width="20.9" height="24.4" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="dec-fused-plan-tokens-4">
+            <rect x="1039.5" y="361.5" width="23.5" height="27" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="1040.8" y="362.8" width="20.9" height="24.4" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+        </g>
+        <g id="dec-fused-latent-tokens">
+          <g id="dec-fused-latent-tokens-1">
+            <rect x="1074.0" y="361.5" width="23.5" height="27" rx="3" fill="url(#dec-token-purple)" stroke="#7f25d8" stroke-width="1.6"/>
+            <rect x="1075.3" y="362.8" width="20.9" height="24.4" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="dec-fused-latent-tokens-2">
+            <rect x="1102.5" y="361.5" width="23.5" height="27" rx="3" fill="url(#dec-token-purple)" stroke="#7f25d8" stroke-width="1.6"/>
+            <rect x="1103.8" y="362.8" width="20.9" height="24.4" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+        </g>
+        <text x="1040" y="411" font-size="24" font-style="italic" font-weight="700" text-anchor="middle" fill="#090b10" xml:space="preserve"><tspan font-style="normal">[</tspan>P<tspan font-style="normal"> ; </tspan>M<tspan font-style="normal">(</tspan>z<tspan baseline-shift="-4.8" font-size="16.32">q</tspan><tspan font-style="normal">)]</tspan></text>
+        <text x="0" y="0" font-size="18.3" font-weight="400" fill="#090b10" text-anchor="middle" transform="translate(1040 440) scale(0.98015 1)">decoder memory</text>
+      </g>
+      <path d="M942.5 451 V480" fill="none" stroke="#7b3cb2" stroke-width="3" id="dec-fused-memory-to-entity-decoder" marker-end="url(#dec-arrow-purple)" stroke-linejoin="round"/>
+    </g>
+    <g id="dec-entity-decoder">
+      <rect x="320.5" y="482.5" width="805" height="186" rx="9" fill="url(#dec-decoder-blue)" stroke="#2c8bdd" stroke-width="3" id="dec-entity-decoder-background"/>
+      <text x="0" y="0" font-size="30" font-weight="700" fill="#081441" text-anchor="middle" transform="translate(724 513) scale(0.95292 1)">Entity Decoder</text>
+      <g id="dec-decoder-queries">
+        <rect x="337" y="529" width="331" height="103" rx="7" fill="#f1f8ff" stroke="#91bff8" stroke-width="1.8"/>
+        <text x="502.5" y="550" font-size="21.5" font-weight="400" fill="#090b10" text-anchor="middle">queries</text>
+        <g id="dec-decoder-source-query-prefix">
+          <g id="dec-decoder-source-query-prefix-1">
+            <rect x="351.5" y="569.5" width="18.4" height="23" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="352.8" y="570.8" width="15.8" height="20.4" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="dec-decoder-source-query-prefix-2">
+            <rect x="374.7" y="569.5" width="18.4" height="23" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="376.0" y="570.8" width="15.8" height="20.4" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="dec-decoder-source-query-prefix-3">
+            <rect x="397.9" y="569.5" width="18.4" height="23" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="399.2" y="570.8" width="15.8" height="20.4" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+        </g>
+        <text x="434" y="587" font-size="23" font-weight="700" fill="#096ec8" text-anchor="middle">···</text>
+        <g id="dec-decoder-source-query-last">
+          <rect x="452.5" y="569.5" width="19" height="23" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+          <rect x="453.8" y="570.8" width="16.4" height="20.4" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+        </g>
+        <line x1="481" y1="570" x2="481" y2="594" stroke="#67778a" stroke-width="1.3"/>
+        <line x1="490" y1="570" x2="490" y2="594" stroke="#67778a" stroke-width="1.3"/>
+        <g id="dec-decoder-birth-query-filled">
+          <g id="dec-decoder-birth-query-filled-1">
+            <rect x="500.5" y="569.5" width="17" height="23" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="501.8" y="570.8" width="14.4" height="20.4" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="dec-decoder-birth-query-filled-2">
+            <rect x="521.0" y="569.5" width="17" height="23" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="522.3" y="570.8" width="14.4" height="20.4" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="dec-decoder-birth-query-filled-3">
+            <rect x="541.5" y="569.5" width="17" height="23" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="542.8" y="570.8" width="14.4" height="20.4" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+        </g>
+        <g id="dec-decoder-birth-query-empty-1">
+          <rect x="563" y="569.5" width="17.5" height="23" rx="2" fill="#fff" stroke="#66758b" stroke-width="1.35"/>
+          <rect x="564.3" y="570.8" width="14.9" height="20.4" rx="1" fill="none" stroke="#d8e3ef" stroke-width="0.65"/>
+        </g>
+        <g id="dec-decoder-birth-query-empty-2">
+          <rect x="585" y="569.5" width="17.5" height="23" rx="2" fill="#fff" stroke="#66758b" stroke-width="1.35"/>
+          <rect x="586.3" y="570.8" width="14.9" height="20.4" rx="1" fill="none" stroke="#d8e3ef" stroke-width="0.65"/>
+        </g>
+        <text x="619" y="587" font-size="21" font-weight="700" fill="#4c5969" text-anchor="middle">···</text>
+        <g id="dec-decoder-birth-query-empty-last">
+          <rect x="635.5" y="569.5" width="18" height="23" rx="2" fill="#fff" stroke="#66758b" stroke-width="1.35"/>
+          <rect x="636.8" y="570.8" width="15.4" height="20.4" rx="1" fill="none" stroke="#d8e3ef" stroke-width="0.65"/>
+        </g>
+      </g>
+      <g id="dec-decoder-cross-attention">
+        <text x="0" y="0" font-size="21.5" font-weight="700" fill="#090b10" text-anchor="middle" transform="translate(775.5 548) scale(0.91821 1)">cross-attention</text>
+        <rect x="711.4" y="552.5" width="128" height="66.5" rx="6" fill="#f9fdff" stroke="#a3c7eb" stroke-width="1.8"/>
+        <g id="dec-cross-attention-matrix">
+          <rect x="731.5" y="560.0" width="21.5" height="18.5" rx="0" fill="#83bdf0" stroke="#ffffff" stroke-width="0.9" id="dec-attention-cell-1-1"/>
+          <rect x="753.0" y="560.0" width="21.5" height="18.5" rx="0" fill="#82bbef" stroke="#ffffff" stroke-width="0.9" id="dec-attention-cell-1-2"/>
+          <rect x="774.5" y="560.0" width="21.5" height="18.5" rx="0" fill="#8bc4f3" stroke="#ffffff" stroke-width="0.9" id="dec-attention-cell-1-3"/>
+          <rect x="796.0" y="560.0" width="21.5" height="18.5" rx="0" fill="#7eb8ec" stroke="#ffffff" stroke-width="0.9" id="dec-attention-cell-1-4"/>
+          <rect x="731.5" y="578.5" width="21.5" height="18.5" rx="0" fill="#6aafea" stroke="#ffffff" stroke-width="0.9" id="dec-attention-cell-2-1"/>
+          <rect x="753.0" y="578.5" width="21.5" height="18.5" rx="0" fill="#70b3ed" stroke="#ffffff" stroke-width="0.9" id="dec-attention-cell-2-2"/>
+          <rect x="774.5" y="578.5" width="21.5" height="18.5" rx="0" fill="#78b7ec" stroke="#ffffff" stroke-width="0.9" id="dec-attention-cell-2-3"/>
+          <rect x="796.0" y="578.5" width="21.5" height="18.5" rx="0" fill="#91c6f2" stroke="#ffffff" stroke-width="0.9" id="dec-attention-cell-2-4"/>
+          <rect x="731.5" y="597.0" width="21.5" height="18.5" rx="0" fill="#85bff1" stroke="#ffffff" stroke-width="0.9" id="dec-attention-cell-3-1"/>
+          <rect x="753.0" y="597.0" width="21.5" height="18.5" rx="0" fill="#76b6ec" stroke="#ffffff" stroke-width="0.9" id="dec-attention-cell-3-2"/>
+          <rect x="774.5" y="597.0" width="21.5" height="18.5" rx="0" fill="#84bff1" stroke="#ffffff" stroke-width="0.9" id="dec-attention-cell-3-3"/>
+          <rect x="796.0" y="597.0" width="21.5" height="18.5" rx="0" fill="#82bcf0" stroke="#ffffff" stroke-width="0.9" id="dec-attention-cell-3-4"/>
+        </g>
+        <path d="M669.5 580 H709.5" fill="none" stroke="#096ec8" stroke-width="3.3" id="dec-query-to-cross-attention" marker-end="url(#dec-arrow-blue)" stroke-linejoin="round"/>
+        <path d="M879.5 580 H841.5" fill="none" stroke="#096ec8" stroke-width="3.3" id="dec-memory-to-cross-attention" marker-end="url(#dec-arrow-blue)" stroke-linejoin="round"/>
+      </g>
+      <g id="dec-decoder-memory">
+        <rect x="882.4" y="529.2" width="227.5" height="103" rx="7.5" fill="#f2f9ff" stroke="#91bff8" stroke-width="1.8"/>
+        <text x="996" y="549" font-size="21.5" font-weight="400" fill="#090b10" text-anchor="middle">memory</text>
+        <g id="dec-decoder-memory-plan-tokens">
+          <g id="dec-decoder-memory-plan-tokens-1">
+            <rect x="911.8" y="562" width="23.5" height="27" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="913.1" y="563.3" width="20.9" height="24.4" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="dec-decoder-memory-plan-tokens-2">
+            <rect x="941.3" y="562" width="23.5" height="27" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="942.6" y="563.3" width="20.9" height="24.4" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="dec-decoder-memory-plan-tokens-3">
+            <rect x="970.8" y="562" width="23.5" height="27" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="972.1" y="563.3" width="20.9" height="24.4" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="dec-decoder-memory-plan-tokens-4">
+            <rect x="1000.3" y="562" width="23.5" height="27" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="1001.6" y="563.3" width="20.9" height="24.4" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+        </g>
+        <g id="dec-decoder-memory-latent-tokens">
+          <g id="dec-decoder-memory-latent-tokens-1">
+            <rect x="1030.5" y="562" width="23.5" height="27" rx="3" fill="url(#dec-token-purple)" stroke="#7f25d8" stroke-width="1.6"/>
+            <rect x="1031.8" y="563.3" width="20.9" height="24.4" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="dec-decoder-memory-latent-tokens-2">
+            <rect x="1060.0" y="562" width="23.5" height="27" rx="3" fill="url(#dec-token-purple)" stroke="#7f25d8" stroke-width="1.6"/>
+            <rect x="1061.3" y="563.3" width="20.9" height="24.4" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+        </g>
+        <text x="998" y="614" font-size="24" font-style="italic" font-weight="700" text-anchor="middle" fill="#090b10" xml:space="preserve"><tspan font-style="normal">[</tspan>P<tspan font-style="normal"> ; </tspan>M<tspan font-style="normal">(</tspan>z<tspan baseline-shift="-4.8" font-size="16.32">q</tspan><tspan font-style="normal">)]</tspan></text>
+      </g>
+      <text x="723" y="657.5" font-size="19.5" font-style="italic" font-weight="400" text-anchor="middle" fill="#090b10" xml:space="preserve"><tspan font-style="normal">TransformerDecoder · 5 layers · </tspan>d<tspan font-style="normal"> = 128</tspan></text>
+      <path d="M723.5 669 V688.5" fill="none" stroke="#096ec8" stroke-width="3.5" id="dec-decoder-to-predicted-state" marker-end="url(#dec-arrow-blue)" stroke-linejoin="round"/>
+    </g>
+    <g id="dec-predicted-next-state">
+      <rect x="355.5" y="690.2" width="737" height="108.3" rx="9" fill="url(#dec-fusion-blue)" stroke="#2b8ada" stroke-width="3.2" id="dec-predicted-state-background"/>
+      <text x="725.5" y="720" font-size="30" font-style="italic" font-weight="700" text-anchor="middle" fill="#081441" xml:space="preserve">ŝ<tspan baseline-shift="-6" font-size="20.4">t+1</tspan></text>
+      <g id="dec-predicted-global-state">
+        <rect x="369" y="732.5" width="202" height="56" rx="7" fill="#ffffff"/>
+        <text x="0" y="0" font-size="19.5" font-weight="700" fill="#090b10" text-anchor="middle" transform="translate(471.5 750) scale(0.96637 1)">Global State</text>
+        <g id="dec-predicted-global-prefix">
+          <g id="dec-predicted-global-prefix-1">
+            <rect x="394.5" y="760.2" width="23.5" height="23.5" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="395.8" y="761.5" width="20.9" height="20.9" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="dec-predicted-global-prefix-2">
+            <rect x="423.5" y="760.2" width="23.5" height="23.5" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="424.8" y="761.5" width="20.9" height="20.9" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="dec-predicted-global-prefix-3">
+            <rect x="452.5" y="760.2" width="23.5" height="23.5" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="453.8" y="761.5" width="20.9" height="20.9" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+        </g>
+        <text x="499" y="779" font-size="27" font-weight="700" fill="#096ec8" text-anchor="middle">···</text>
+        <g id="dec-predicted-global-last">
+          <rect x="522.5" y="760.2" width="23.5" height="23.5" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+          <rect x="523.8" y="761.5" width="20.9" height="20.9" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+        </g>
+      </g>
+      <g id="dec-predicted-existing-entities">
+        <rect x="585.5" y="732.5" width="212" height="56" rx="7" fill="#ffffff"/>
+        <text x="0" y="0" font-size="19.5" font-weight="700" fill="#090b10" text-anchor="middle" transform="translate(691.5 750) scale(0.94828 1)">Existing Entities</text>
+        <g id="dec-predicted-existing-prefix">
+          <g id="dec-predicted-existing-prefix-1">
+            <rect x="612.5" y="760.2" width="23.5" height="23.5" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="613.8" y="761.5" width="20.9" height="20.9" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="dec-predicted-existing-prefix-2">
+            <rect x="643.75" y="760.2" width="23.5" height="23.5" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="645.05" y="761.5" width="20.9" height="20.9" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="dec-predicted-existing-prefix-3">
+            <rect x="675.0" y="760.2" width="23.5" height="23.5" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="676.3" y="761.5" width="20.9" height="20.9" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+        </g>
+        <text x="723" y="779" font-size="27" font-weight="700" fill="#096ec8" text-anchor="middle">···</text>
+        <g id="dec-predicted-existing-last">
+          <rect x="748.5" y="760.2" width="23.5" height="23.5" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+          <rect x="749.8" y="761.5" width="20.9" height="20.9" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+        </g>
+      </g>
+      <g id="dec-predicted-new-entities">
+        <rect x="809.5" y="732.5" width="269" height="56" rx="7" fill="#ffffff"/>
+        <text x="0" y="0" font-size="19.5" font-weight="700" fill="#090b10" text-anchor="middle" transform="translate(942.5 750) scale(0.96575 1)">New Entities × 10</text>
+        <g id="dec-predicted-birth-filled-prefix">
+          <g id="dec-predicted-birth-filled-prefix-1">
+            <rect x="820.0" y="760.2" width="18.2" height="23.5" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="821.3" y="761.5" width="15.6" height="20.9" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="dec-predicted-birth-filled-prefix-2">
+            <rect x="843.5" y="760.2" width="18.2" height="23.5" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="844.8" y="761.5" width="15.6" height="20.9" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="dec-predicted-birth-filled-prefix-3">
+            <rect x="867.0" y="760.2" width="18.2" height="23.5" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="868.3" y="761.5" width="15.6" height="20.9" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+          <g id="dec-predicted-birth-filled-prefix-4">
+            <rect x="890.5" y="760.2" width="18.2" height="23.5" rx="3" fill="url(#dec-token-blue)" stroke="#006af3" stroke-width="1.6"/>
+            <rect x="891.8" y="761.5" width="15.6" height="20.9" rx="2" fill="none" stroke="#ffffff" stroke-width="0.65" opacity="0.5"/>
+          </g>
+        </g>
+        <g id="dec-predicted-birth-empty-prefix-1">
+          <rect x="914" y="760.2" width="18.2" height="23.5" rx="2" fill="#fff" stroke="#66758b" stroke-width="1.35"/>
+          <rect x="915.3" y="761.5" width="15.6" height="20.9" rx="1" fill="none" stroke="#d8e3ef" stroke-width="0.65"/>
+        </g>
+        <g id="dec-predicted-birth-empty-prefix-2">
+          <rect x="937.5" y="760.2" width="18.2" height="23.5" rx="2" fill="#fff" stroke="#66758b" stroke-width="1.35"/>
+          <rect x="938.8" y="761.5" width="15.6" height="20.9" rx="1" fill="none" stroke="#d8e3ef" stroke-width="0.65"/>
+        </g>
+        <g id="dec-predicted-birth-empty-prefix-3">
+          <rect x="961" y="760.2" width="18.2" height="23.5" rx="2" fill="#fff" stroke="#66758b" stroke-width="1.35"/>
+          <rect x="962.3" y="761.5" width="15.6" height="20.9" rx="1" fill="none" stroke="#d8e3ef" stroke-width="0.65"/>
+        </g>
+        <text x="1001" y="779" font-size="22" font-weight="700" fill="#4c5969" text-anchor="middle">···</text>
+        <g id="dec-predicted-birth-empty-suffix-1">
+          <rect x="1022.5" y="760.2" width="18.2" height="23.5" rx="2" fill="#fff" stroke="#66758b" stroke-width="1.35"/>
+          <rect x="1023.8" y="761.5" width="15.6" height="20.9" rx="1" fill="none" stroke="#d8e3ef" stroke-width="0.65"/>
+        </g>
+        <g id="dec-predicted-birth-empty-suffix-2">
+          <rect x="1046.5" y="760.2" width="18.2" height="23.5" rx="2" fill="#fff" stroke="#66758b" stroke-width="1.35"/>
+          <rect x="1047.8" y="761.5" width="15.6" height="20.9" rx="1" fill="none" stroke="#d8e3ef" stroke-width="0.65"/>
+        </g>
+      </g>
+    </g>
+    <g id="dec-ground-truth-target">
+      <rect x="1170.4" y="635.5" width="181" height="78.2" rx="7" fill="url(#dec-panel-orange)" stroke="#ff7609" stroke-width="2.3"/>
+      <text x="1260.9" y="667" font-size="29" font-style="italic" font-weight="700" text-anchor="middle" fill="#090b10" xml:space="preserve">s<tspan baseline-shift="-5.8" font-size="19.72">t+1</tspan></text>
+      <text x="0" y="0" font-size="20" font-weight="400" fill="#090b10" text-anchor="middle" transform="translate(1260.9 695) scale(1.00901 1)">ground-truth target</text>
+    </g>
+    <g id="dec-reconstruction-supervision">
+      <title>Ground truth jointly supervises global state, existing entities, and new entities</title>
+      <rect x="387.5" y="809.5" width="674" height="155.5" rx="10" fill="#faf7ff" stroke="#d5c4eb" stroke-width="1.2" id="dec-shared-supervision-background"/>
+      <g id="dec-prediction-to-component-losses">
+        <path d="M473.5 799 V818.5" fill="none" stroke="#7b3cb2" stroke-width="2.3" id="dec-global-prediction-to-loss" marker-end="url(#dec-arrow-purple-small)" stroke-linejoin="round"/>
+        <path d="M710.5 799 V818.5" fill="none" stroke="#7b3cb2" stroke-width="2.3" id="dec-existing-predictions-to-loss" marker-end="url(#dec-arrow-purple-small)" stroke-linejoin="round"/>
+        <path d="M950 799 V818.5" fill="none" stroke="#7b3cb2" stroke-width="2.3" id="dec-birth-predictions-to-loss" marker-end="url(#dec-arrow-purple-small)" stroke-linejoin="round"/>
+      </g>
+      <g id="dec-global-reconstruction-loss">
+        <rect x="407.5" y="820" width="132" height="42" rx="5" fill="#fdfaff" stroke="#8541bf" stroke-width="1.9"/>
+        <text x="473.5" y="846" font-size="23.5" font-style="italic" font-weight="400" text-anchor="middle" fill="#081441" xml:space="preserve">ℒ<tspan baseline-shift="-4.7" font-size="15.98"><tspan font-style="normal">global</tspan></tspan></text>
+        <path d="M473.5 862 V875.5" fill="none" stroke="#7b3cb2" stroke-width="2.1" id="dec-global-loss-to-reconstruction" marker-end="url(#dec-arrow-purple-small)" stroke-linejoin="round"/>
+      </g>
+      <g id="dec-source-reconstruction-loss">
+        <rect x="645" y="820" width="132" height="42" rx="5" fill="#fdfaff" stroke="#8541bf" stroke-width="1.9"/>
+        <text x="711" y="846" font-size="23.5" font-style="italic" font-weight="400" text-anchor="middle" fill="#081441" xml:space="preserve">ℒ<tspan baseline-shift="-4.7" font-size="15.98"><tspan font-style="normal">source</tspan></tspan></text>
+        <path d="M710.5 862 V875.5" fill="none" stroke="#7b3cb2" stroke-width="2.1" id="dec-source-loss-to-reconstruction" marker-end="url(#dec-arrow-purple-small)" stroke-linejoin="round"/>
+      </g>
+      <g id="dec-birth-reconstruction-loss">
+        <rect x="884.5" y="820" width="132" height="42" rx="5" fill="#fdfaff" stroke="#8541bf" stroke-width="1.9"/>
+        <text x="950.5" y="846" font-size="23.5" font-style="italic" font-weight="400" text-anchor="middle" fill="#081441" xml:space="preserve">ℒ<tspan baseline-shift="-4.7" font-size="15.98"><tspan font-style="normal">birth</tspan></tspan></text>
+        <path d="M950 862 V875.5" fill="none" stroke="#7b3cb2" stroke-width="2.1" id="dec-birth-loss-to-reconstruction" marker-end="url(#dec-arrow-purple-small)" stroke-linejoin="round"/>
+      </g>
+      <g id="dec-reconstruction-loss-sum">
+        <rect x="400" y="877" width="648" height="78" rx="6" fill="url(#dec-panel-purple)" stroke="#7b34b3" stroke-width="1.8"/>
+        <text x="0" y="0" font-size="25.5" font-weight="700" fill="#081441" text-anchor="middle" transform="translate(724 902) scale(0.93820 1)">Reconstruction Loss</text>
+        <text x="724" y="935" font-size="25" font-style="italic" font-weight="400" text-anchor="middle" fill="#081441" id="dec-reconstruction-loss-equation" xml:space="preserve">ℒ<tspan baseline-shift="-5" font-size="17"><tspan font-style="normal">reconstruction</tspan></tspan><tspan font-style="normal"> = </tspan>ℒ<tspan baseline-shift="-5" font-size="17"><tspan font-style="normal">global</tspan></tspan><tspan font-style="normal"> + </tspan>ℒ<tspan baseline-shift="-5" font-size="17"><tspan font-style="normal">source</tspan></tspan><tspan font-style="normal"> + </tspan>ℒ<tspan baseline-shift="-5" font-size="17"><tspan font-style="normal">birth</tspan></tspan></text>
+      </g>
+    </g>
+    <g id="dec-ground-truth-supervision-connection">
+      <path d="M1260.9 714 V867 H1063.5" fill="none" stroke="#ff790c" stroke-width="2.3" id="dec-ground-truth-to-shared-losses" stroke-dasharray="7 5" stroke-linejoin="round" marker-end="url(#dec-arrow-target)"/>
+      <text x="0" y="0" font-size="21" font-weight="700" fill="#ee710b" text-anchor="middle" transform="translate(1158 852) scale(1.05091 1)">training only</text>
+    </g>
+    <g id="dec-training-objective-connections">
+      <path d="M723.5 955.5 V971" fill="none" stroke="#7b3cb2" stroke-width="2.7" id="dec-reconstruction-to-total-objective" marker-end="url(#dec-arrow-purple-small)" stroke-linejoin="round"/>
+      <path d="M364.5 1010 H398.5" fill="none" stroke="#7b3cb2" stroke-width="2.8" id="dec-kl-to-total-objective" marker-end="url(#dec-arrow-purple-small)" stroke-linejoin="round"/>
+    </g>
+    <g id="dec-encoder-kl-term">
+      <rect x="150.5" y="978.5" width="214" height="66" rx="6" fill="url(#dec-panel-purple)" stroke="#8140bb" stroke-width="2"/>
+      <text x="257.5" y="1005" font-size="23" font-style="italic" font-weight="400" text-anchor="middle" fill="#081441" xml:space="preserve"><tspan font-style="normal">KL(</tspan>q<tspan font-style="normal"> || </tspan>p<tspan font-style="normal">)</tspan></text>
+      <text x="0" y="0" font-size="19.5" font-weight="400" fill="#081441" text-anchor="middle" transform="translate(257.5 1030) scale(1.00660 1)">from Encoder Stage</text>
+    </g>
+    <g id="dec-total-training-objective">
+      <rect x="400" y="972.5" width="648" height="78" rx="6" fill="url(#dec-panel-purple)" stroke="#7533ae" stroke-width="2.2"/>
+      <text x="0" y="0" font-size="24.5" font-weight="700" fill="#081441" text-anchor="middle" transform="translate(724 998) scale(0.96835 1)">Total Training Objective</text>
+      <text x="724" y="1030.5" font-size="24.5" font-style="italic" font-weight="400" text-anchor="middle" fill="#081441" id="dec-total-training-objective-equation" xml:space="preserve">ℒ<tspan baseline-shift="-4.9" font-size="16.66"><tspan font-style="normal">total</tspan></tspan><tspan font-style="normal"> = </tspan>ℒ<tspan baseline-shift="-4.9" font-size="16.66"><tspan font-style="normal">reconstruction</tspan></tspan><tspan font-style="normal"> + </tspan>w<tspan baseline-shift="-4.9" font-size="16.66">kl</tspan><tspan font-style="normal"> · KL(</tspan>q<tspan font-style="normal"> || </tspan>p<tspan font-style="normal">)</tspan></text>
+    </g>
+    <g id="dec-decoder-configuration">
+      <text x="724" y="1075" font-size="18" font-style="italic" font-weight="400" text-anchor="middle" fill="#090b10" id="dec-decoder-configuration-note" xml:space="preserve"><tspan font-style="normal">queries = </tspan>H<tspan baseline-shift="-3.6" font-size="12.24">s</tspan><tspan font-style="normal"> + 10 birth queries   ·   memory = </tspan><tspan font-style="normal">[</tspan>P<tspan font-style="normal"> ; </tspan>M<tspan font-style="normal">(</tspan>z<tspan baseline-shift="-3.6" font-size="12.24">q</tspan><tspan font-style="normal">)]</tspan><tspan font-style="normal">   ·   birth slots = 10</tspan></text>
+    </g>
+  </g>
+  <g id="encoder-to-decoder-interface">
+    <title>The same H_s, P, z_q tensors connect Encoder outputs to Decoder inputs</title>
+    <path d="M1406.2 1176.6 H1598 Q1620 1176.6 1620 1154.6 V336.5 Q1620 314.5 1642 314.5 H2125.5" fill="none" stroke="#176fc3" stroke-width="4" stroke-linejoin="round" marker-end="url(#figure-arrow-interface)" id="encoder-output-bundle-to-decoder-input-bundle"/>
+    <circle cx="1404.9" cy="1176.6" r="4.4" fill="#ffffff" stroke="#176fc3" stroke-width="2" id="encoder-interface-port"/>
+    <text x="1875" y="293" text-anchor="middle" font-family="Times New Roman, Times, serif" font-size="29" font-weight="700" fill="#0b3b70" id="transferred-tensors" xml:space="preserve"><tspan font-style="italic">H</tspan><tspan font-style="italic" font-size="20" baseline-shift="-6">s</tspan><tspan>  ·  </tspan><tspan font-style="italic">P</tspan><tspan>  ·  </tspan><tspan font-style="italic" fill="#7b3cb2">z</tspan><tspan font-style="italic" font-size="20" baseline-shift="-6" fill="#7b3cb2">q</tspan></text>
+    <text x="1875" y="346" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#56667b" id="interface-direction-label">Encoder → Decoder</text>
+  </g>
+  <g id="shared-encoders-detail-reference">
+    <title>Panel (c) expands Shared Feature Encoders in panel (a)</title>
+    <line x1="230" y1="1330" x2="3055" y2="1330" stroke="#c7d2de" stroke-width="1.5"/>
+    <path d="M181.8 527.9 H112 Q96 527.9 96 543.9 V1386 Q96 1402 112 1402 H383" fill="none" stroke="#8191a4" stroke-width="2.4" stroke-dasharray="9 7" stroke-linejoin="round" id="shared-feature-encoders-expanded-view-leader"/>
+    <circle cx="183.8" cy="527.9" r="4.5" fill="#ffffff" stroke="#8191a4" stroke-width="2" id="shared-feature-detail-reference-port"/>
+    <circle cx="406" cy="1402" r="22" fill="#edf3f9" stroke="#8191a4" stroke-width="1.8" id="expanded-detail-panel-label-background"/>
+    <text x="406" y="1410" font-family="Arial, Helvetica, sans-serif" font-size="27" text-anchor="middle" font-weight="700" fill="#354c65" id="expanded-detail-panel-label">c</text>
+    <text x="448" y="1415" font-family="Arial, Helvetica, sans-serif" font-size="36" font-weight="700" fill="#101d35" id="expanded-detail-title">Detailed Feature Encoders for Structured Game States</text>
+    <text x="448" y="1446" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#56667b" id="expanded-detail-description">Expanded view of Shared Feature Encoders in panel (a)</text>
+  </g>
+  <g id="figure-connection-key" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#56667b">
+    <path d="M2360 1400 H2423" fill="none" stroke="#176fc3" stroke-width="3" marker-end="url(#figure-arrow-interface)"/>
+    <text x="2440" y="1407">Cross-panel tensor transfer</text>
+    <line x1="2360" y1="1434" x2="2423" y2="1434" stroke="#8191a4" stroke-width="2.4" stroke-dasharray="9 7"/>
+    <text x="2440" y="1441">Detail expansion</text>
+  </g>
+  <g id="panel-c-detailed-feature-encoders" transform="translate(377.25 1385) scale(1.5)" fill="none">
+    <title>Detailed Feature Encoders for Structured Game States</title>
+    <g id="features-panel-a">
+      <rect x="8.5" y="50.2" width="957.2" height="785.1" rx="9" id="features-panel-a-background" fill="url(#features-panel-blue)" stroke="#0081ff" stroke-width="1.5"/>
+      <text x="0" y="0" font-size="27" class="bold black" transform="translate(22.5 79) scale(0.94646 1)" id="features-panel-a-title">(c.1) Entity State Transformer Encoder</text>
+      <g id="features-current-state">
+        <text x="0" y="0" font-size="18" class="bold" transform="translate(23 112) scale(0.96420 1)">Current state</text>
+        <text x="143" y="112" class="math" font-size="20"><tspan font-style="italic">s</tspan><tspan baseline-shift="sub" font-size="14" font-style="italic">t</tspan></text>
+        <text x="0" y="0" font-size="17.5" class="bold" transform="translate(168 112) scale(0.92813 1)">(structured tokens)</text>
+        <g id="features-current-state-labels">
+          <text x="0" y="0" font-size="14" text-anchor="middle" transform="translate(93 135) scale(0.94124 1)">global scalar</text>
+          <text x="0" y="0" font-size="14" text-anchor="middle" transform="translate(93 151) scale(0.98144 1)">variables</text>
+          <text x="207" y="138.5" font-size="14" text-anchor="middle">hand</text>
+          <text x="329" y="138.5" font-size="14" text-anchor="middle">library</text>
+          <text x="451" y="138.5" font-size="14" text-anchor="middle">graveyard</text>
+          <text x="571" y="138.5" font-size="14" text-anchor="middle">stack cards</text>
+          <text x="693" y="138.5" font-size="14" text-anchor="middle">self board</text>
+          <text x="850" y="138.5" font-size="14" text-anchor="middle">opponent board</text>
+        </g>
+        <g id="features-global-scalar-state">
+          <rect x="55.2" y="156.7" width="76" height="44.8" rx="2" class="token-frame"/>
+          <rect x="58.2" y="159.7" width="15" height="18.8" class="matrix-cell" opacity="0.89"/>
+          <rect x="74.7" y="159.7" width="15" height="18.8" class="matrix-cell" opacity="0.935"/>
+          <rect x="91.2" y="159.7" width="15" height="18.8" class="matrix-cell" opacity="0.98"/>
+          <rect x="58.2" y="180.5" width="15" height="18.8" class="matrix-cell" opacity="0.935"/>
+          <rect x="74.7" y="180.5" width="15" height="18.8" class="matrix-cell" opacity="0.98"/>
+          <rect x="91.2" y="180.5" width="15" height="18.8" class="matrix-cell" opacity="0.89"/>
+          <text x="118.2" y="183.132" font-size="14" text-anchor="middle">...</text>
+        </g>
+        <g id="features-hand-state">
+          <rect x="165.6" y="151.3" width="82.2" height="50.1" rx="2" class="token-frame"/>
+          <rect x="168.6" y="154.3" width="18" height="20.2" class="matrix-cell" opacity="0.89"/>
+          <rect x="188.1" y="154.3" width="18" height="20.2" class="matrix-cell" opacity="0.935"/>
+          <rect x="207.6" y="154.3" width="18" height="20.2" class="matrix-cell" opacity="0.98"/>
+          <rect x="168.6" y="176.5" width="18" height="20.2" class="matrix-cell" opacity="0.935"/>
+          <rect x="188.1" y="176.5" width="18" height="20.2" class="matrix-cell" opacity="0.98"/>
+          <rect x="207.6" y="176.5" width="18" height="20.2" class="matrix-cell" opacity="0.89"/>
+          <text x="234.8" y="180.859" font-size="14" text-anchor="middle">...</text>
+        </g>
+        <g id="features-library-state">
+          <rect x="285.5" y="151.3" width="86.2" height="50.1" rx="2" class="token-frame"/>
+          <rect x="288.5" y="154.3" width="18" height="20.2" class="matrix-cell" opacity="0.89"/>
+          <rect x="308.0" y="154.3" width="18" height="20.2" class="matrix-cell" opacity="0.935"/>
+          <rect x="327.5" y="154.3" width="18" height="20.2" class="matrix-cell" opacity="0.98"/>
+          <rect x="288.5" y="176.5" width="18" height="20.2" class="matrix-cell" opacity="0.935"/>
+          <rect x="308.0" y="176.5" width="18" height="20.2" class="matrix-cell" opacity="0.98"/>
+          <rect x="327.5" y="176.5" width="18" height="20.2" class="matrix-cell" opacity="0.89"/>
+          <text x="358.7" y="180.859" font-size="14" text-anchor="middle">...</text>
+        </g>
+        <g id="features-graveyard-state">
+          <rect x="408.5" y="151.3" width="85.7" height="50.1" rx="2" class="token-frame"/>
+          <rect x="411.5" y="154.3" width="18" height="20.2" class="matrix-cell" opacity="0.89"/>
+          <rect x="431.0" y="154.3" width="18" height="20.2" class="matrix-cell" opacity="0.935"/>
+          <rect x="450.5" y="154.3" width="18" height="20.2" class="matrix-cell" opacity="0.98"/>
+          <rect x="411.5" y="176.5" width="18" height="20.2" class="matrix-cell" opacity="0.935"/>
+          <rect x="431.0" y="176.5" width="18" height="20.2" class="matrix-cell" opacity="0.98"/>
+          <rect x="450.5" y="176.5" width="18" height="20.2" class="matrix-cell" opacity="0.89"/>
+          <text x="481.2" y="180.859" font-size="14" text-anchor="middle">...</text>
+        </g>
+        <g id="features-stack-state">
+          <rect x="527" y="151.3" width="88.2" height="50.1" rx="2" class="token-frame"/>
+          <rect x="530.0" y="154.3" width="18" height="20.2" class="matrix-cell" opacity="0.89"/>
+          <rect x="549.5" y="154.3" width="18" height="20.2" class="matrix-cell" opacity="0.935"/>
+          <rect x="569.0" y="154.3" width="18" height="20.2" class="matrix-cell" opacity="0.98"/>
+          <rect x="530.0" y="176.5" width="18" height="20.2" class="matrix-cell" opacity="0.935"/>
+          <rect x="549.5" y="176.5" width="18" height="20.2" class="matrix-cell" opacity="0.98"/>
+          <rect x="569.0" y="176.5" width="18" height="20.2" class="matrix-cell" opacity="0.89"/>
+          <text x="602.2" y="180.859" font-size="14" text-anchor="middle">...</text>
+        </g>
+        <g id="features-self-board-state">
+          <rect x="649.5" y="151.3" width="87" height="50.1" rx="2" class="token-frame"/>
+          <rect x="652.5" y="154.3" width="18" height="20.2" class="matrix-cell" opacity="0.89"/>
+          <rect x="672.0" y="154.3" width="18" height="20.2" class="matrix-cell" opacity="0.935"/>
+          <rect x="691.5" y="154.3" width="18" height="20.2" class="matrix-cell" opacity="0.98"/>
+          <rect x="652.5" y="176.5" width="18" height="20.2" class="matrix-cell" opacity="0.935"/>
+          <rect x="672.0" y="176.5" width="18" height="20.2" class="matrix-cell" opacity="0.98"/>
+          <rect x="691.5" y="176.5" width="18" height="20.2" class="matrix-cell" opacity="0.89"/>
+          <text x="723.5" y="180.859" font-size="14" text-anchor="middle">...</text>
+        </g>
+        <g id="features-opponent-board-state">
+          <rect x="776.8" y="151.3" width="146.6" height="50.1" rx="2" class="token-frame"/>
+          <rect x="779.8" y="154.3" width="18" height="20.2" class="matrix-cell" opacity="0.89"/>
+          <rect x="799.3" y="154.3" width="18" height="20.2" class="matrix-cell" opacity="0.935"/>
+          <rect x="818.8" y="154.3" width="18" height="20.2" class="matrix-cell" opacity="0.98"/>
+          <rect x="838.3" y="154.3" width="18" height="20.2" class="matrix-cell" opacity="0.89"/>
+          <rect x="857.8" y="154.3" width="18" height="20.2" class="matrix-cell" opacity="0.935"/>
+          <rect x="877.3" y="154.3" width="18" height="20.2" class="matrix-cell" opacity="0.98"/>
+          <rect x="779.8" y="176.5" width="18" height="20.2" class="matrix-cell" opacity="0.935"/>
+          <rect x="799.3" y="176.5" width="18" height="20.2" class="matrix-cell" opacity="0.98"/>
+          <rect x="818.8" y="176.5" width="18" height="20.2" class="matrix-cell" opacity="0.89"/>
+          <rect x="838.3" y="176.5" width="18" height="20.2" class="matrix-cell" opacity="0.935"/>
+          <rect x="857.8" y="176.5" width="18" height="20.2" class="matrix-cell" opacity="0.98"/>
+          <rect x="877.3" y="176.5" width="18" height="20.2" class="matrix-cell" opacity="0.89"/>
+          <text x="910.4" y="180.859" font-size="14" text-anchor="middle">...</text>
+        </g>
+      </g>
+      <g id="features-token-sequence">
+        <text x="0" y="0" font-size="18" class="bold" transform="translate(23 235) scale(0.90040 1)">Token sequence</text>
+        <rect x="24" y="240.5" width="58" height="74.5" rx="5" fill="url(#features-blue-fill)"/>
+        <rect x="85" y="240.5" width="411.5" height="74.5" rx="5" fill="url(#features-blue-fill)"/>
+        <rect x="499.3" y="240.5" width="444.7" height="81" rx="4.5" fill="#eaf8ff" stroke="#77beff" stroke-width="0.9"/>
+        <rect x="500.3" y="240.5" width="442.7" height="24" rx="3" fill="url(#features-blue-fill)"/>
+        <text x="0" y="0" font-size="16.5" class="bold" text-anchor="middle" transform="translate(273 260.5) scale(0.88875 1)">global scalar tokens</text>
+        <text x="0" y="0" font-size="14.7" class="bold" text-anchor="middle" transform="translate(722 255.2) scale(0.92561 1)">entity tokens (one token per slot)</text>
+        <rect x="25.5" y="275" width="55" height="40" rx="3" class="scalar-box" id="features-cls-token"/>
+        <text x="0" y="0" font-size="15.4" class="bold" text-anchor="middle" transform="translate(53 301) scale(0.82806 1)">[CLS]</text>
+        <g id="features-global-scalar-tokens">
+          <g id="features-scalar-token-1">
+            <rect x="86.4" y="275" width="51" height="40" rx="2" class="scalar-box"/>
+            <text x="0" y="0" font-size="11.3" text-anchor="middle" transform="translate(111.9 298.4) scale(0.92673 1)">scl_life</text>
+          </g>
+          <g id="features-scalar-token-2">
+            <rect x="137.6" y="275" width="51.6" height="40" rx="2" class="scalar-box"/>
+            <text x="0" y="0" font-size="11.3" text-anchor="middle" transform="translate(163.4 298.4) scale(0.95986 1)">oppo_life</text>
+          </g>
+          <g id="features-scalar-token-3">
+            <rect x="189.3" y="275" width="51.1" height="40" rx="2" class="scalar-box"/>
+            <text x="0" y="0" font-size="11.3" text-anchor="middle" transform="translate(214.85 298.4) scale(0.97063 1)">mana_c</text>
+          </g>
+          <g id="features-scalar-token-4">
+            <rect x="240.5" y="275" width="51.1" height="40" rx="2" class="scalar-box"/>
+            <text x="0" y="0" font-size="11.3" text-anchor="middle" transform="translate(266.05 298.4) scale(0.91356 1)">mana_w</text>
+          </g>
+          <g id="features-scalar-token-5">
+            <rect x="291.7" y="275" width="50.9" height="40" rx="2" class="scalar-box"/>
+            <text x="0" y="0" font-size="11.3" text-anchor="middle" transform="translate(317.15 298.4) scale(0.91356 1)">mana_w</text>
+          </g>
+          <g id="features-scalar-token-6">
+            <rect x="342.7" y="275" width="50.8" height="40" rx="2" class="scalar-box"/>
+            <text x="0" y="0" font-size="11.3" text-anchor="middle" transform="translate(368.1 298.4) scale(0.90846 1)">mana_b′</text>
+          </g>
+          <g id="features-scalar-token-7">
+            <rect x="393.6" y="275" width="50.3" height="40" rx="2" class="scalar-box"/>
+            <text x="0" y="0" font-size="11.3" text-anchor="middle" transform="translate(418.75 298.4) scale(0.95565 1)">mana_b</text>
+          </g>
+          <g id="features-scalar-token-8">
+            <rect x="444" y="275" width="50.1" height="40" rx="2" class="scalar-box"/>
+            <text x="0" y="0" font-size="11.3" text-anchor="middle" transform="translate(469.05 298.4) scale(0.95565 1)">mana_g</text>
+          </g>
+        </g>
+        <path d="M86.5 317 C86.5 323 88.5 325 94 325 H282 Q290 325 290 331 Q291 325 298 325 H487 Q494 325 494 318" class="brace" id="features-global-scalars-brace"/>
+        <text x="0" y="0" font-size="14" text-anchor="middle" transform="translate(290 343.5) scale(1.11483 1)">global scalars = life × 2 + mana × 6</text>
+        <path d="M500 272 Q500 264 508 264 H722 L728 260 L733 264 H936 Q944 264 944 272" class="brace" id="features-entity-tokens-brace"/>
+        <g id="features-entity-token-labels">
+          <text x="0" y="0" font-size="13.5" text-anchor="middle" transform="translate(530 284.7) scale(0.93209 1)">hand</text>
+          <text x="0" y="0" font-size="13.5" text-anchor="middle" transform="translate(591 284.7) scale(1.03345 1)">library</text>
+          <text x="0" y="0" font-size="13.5" text-anchor="middle" transform="translate(661 284.7) scale(0.93256 1)">graveyard</text>
+          <text x="0" y="0" font-size="13.5" text-anchor="middle" transform="translate(727 284.7) scale(0.92034 1)">stack</text>
+          <text x="0" y="0" font-size="13.5" text-anchor="middle" transform="translate(800 284.7) scale(0.94435 1)">self board</text>
+          <text x="0" y="0" font-size="13.5" text-anchor="middle" transform="translate(893 284.7) scale(0.97241 1)">opponent board</text>
+        </g>
+        <g id="features-hand-token">
+          <rect x="503" y="291.5" width="54" height="26" rx="2" class="token-frame"/>
+          <rect x="506.0" y="294.5" width="17" height="20" class="matrix-cell"/>
+          <rect x="524.5" y="294.5" width="17" height="20" class="matrix-cell"/>
+          <text x="547" y="308.4" font-size="16" text-anchor="middle">···</text>
+        </g>
+        <g id="features-library-token">
+          <rect x="562.5" y="291.5" width="58.5" height="26" rx="2" class="token-frame"/>
+          <rect x="565.5" y="294.5" width="17.5" height="20" class="matrix-cell"/>
+          <rect x="584.5" y="294.5" width="17.5" height="20" class="matrix-cell"/>
+          <text x="611.0" y="308.4" font-size="16" text-anchor="middle">···</text>
+        </g>
+        <g id="features-graveyard-token">
+          <rect x="626.5" y="291.5" width="69" height="26" rx="2" class="token-frame"/>
+          <rect x="629.5" y="294.5" width="15.5" height="20" class="matrix-cell"/>
+          <rect x="646.5" y="294.5" width="15.5" height="20" class="matrix-cell"/>
+          <rect x="663.5" y="294.5" width="15.5" height="20" class="matrix-cell"/>
+          <text x="685.5" y="308.4" font-size="16" text-anchor="middle">···</text>
+        </g>
+        <g id="features-stack-token">
+          <rect x="700.5" y="291.5" width="52.5" height="26" rx="2" class="token-frame"/>
+          <rect x="703.5" y="294.5" width="15" height="20" class="matrix-cell"/>
+          <rect x="720.0" y="294.5" width="15" height="20" class="matrix-cell"/>
+          <text x="743.0" y="308.4" font-size="16" text-anchor="middle">···</text>
+        </g>
+        <g id="features-self-board-token">
+          <rect x="760.5" y="291.5" width="76.5" height="26" rx="2" class="token-frame"/>
+          <rect x="763.5" y="294.5" width="17" height="20" class="matrix-cell"/>
+          <rect x="782.0" y="294.5" width="17" height="20" class="matrix-cell"/>
+          <rect x="800.5" y="294.5" width="17" height="20" class="matrix-cell"/>
+          <text x="827.0" y="308.4" font-size="16" text-anchor="middle">···</text>
+        </g>
+        <g id="features-opponent-board-token">
+          <rect x="845.5" y="291.5" width="95.5" height="26" rx="2" class="token-frame"/>
+          <rect x="848.5" y="294.5" width="18" height="20" class="matrix-cell"/>
+          <rect x="868.0" y="294.5" width="18" height="20" class="matrix-cell"/>
+          <rect x="887.5" y="294.5" width="18" height="20" class="matrix-cell"/>
+          <text x="931.0" y="308.4" font-size="16" text-anchor="middle">···</text>
+        </g>
+      </g>
+      <g id="features-transformer-input-arrows">
+        <path d="M498 324 V336.5 H747.5 V550" class="blue-arrow" id="features-sequence-to-transformer"/>
+        <path d="M557 504 V577 H599" class="blue-arrow" id="features-padding-mask-to-transformer"/>
+      </g>
+      <g id="features-padding-mask">
+        <text x="0" y="0" font-size="18" class="bold" transform="translate(23 370) scale(0.94809 1)">Transformer padding mask</text>
+        <rect x="24" y="378.8" width="69" height="29.5" rx="4" fill="url(#features-blue-fill)"/>
+        <rect x="94" y="378.8" width="347" height="29.5" fill="url(#features-blue-fill)"/>
+        <rect x="442" y="378.8" width="258" height="29.5" rx="5" fill="url(#features-blue-fill)"/>
+        <text x="0" y="0" font-size="15.5" class="bold" text-anchor="middle" transform="translate(58.5 398) scale(0.87125 1)">[CLS]</text>
+        <text x="0" y="0" font-size="15.5" class="bold" text-anchor="middle" transform="translate(266 398) scale(0.88975 1)">global scalars</text>
+        <text x="0" y="0" font-size="15.5" class="bold" text-anchor="middle" transform="translate(572 398) scale(0.92875 1)">entity slots</text>
+        <rect x="25.5" y="408.5" width="65.5" height="29.5" id="features-cls-mask-cell" fill="#fff" stroke="#1175cf" stroke-width="1.3"/>
+        <text x="58.2" y="428" font-size="14.5" class="bold black" text-anchor="middle">0</text>
+        <g id="features-global-scalar-mask-cells">
+          <rect x="94" y="408.5" width="45" height="29.5" fill="#fff" stroke="#1175cf" stroke-width="1.15"/>
+          <text x="116.5" y="428" font-size="14.5" class="bold black" text-anchor="middle">0</text>
+          <rect x="139" y="408.5" width="44" height="29.5" fill="#fff" stroke="#1175cf" stroke-width="1.15"/>
+          <text x="161.0" y="428" font-size="14.5" class="bold black" text-anchor="middle">0</text>
+          <rect x="183" y="408.5" width="43" height="29.5" fill="#fff" stroke="#1175cf" stroke-width="1.15"/>
+          <text x="204.5" y="428" font-size="14.5" class="bold black" text-anchor="middle">0</text>
+          <rect x="226" y="408.5" width="42" height="29.5" fill="#fff" stroke="#1175cf" stroke-width="1.15"/>
+          <text x="247.0" y="428" font-size="14.5" class="bold black" text-anchor="middle">0</text>
+          <rect x="268" y="408.5" width="42" height="29.5" fill="#fff" stroke="#1175cf" stroke-width="1.15"/>
+          <text x="289.0" y="428" font-size="14.5" class="bold black" text-anchor="middle">0</text>
+          <rect x="310" y="408.5" width="42" height="29.5" fill="#fff" stroke="#1175cf" stroke-width="1.15"/>
+          <text x="331.0" y="428" font-size="14.5" class="bold black" text-anchor="middle">0</text>
+          <rect x="352" y="408.5" width="43" height="29.5" fill="#fff" stroke="#1175cf" stroke-width="1.15"/>
+          <text x="373.5" y="428" font-size="14.5" class="bold black" text-anchor="middle">0</text>
+          <rect x="395" y="408.5" width="44" height="29.5" fill="#fff" stroke="#1175cf" stroke-width="1.15"/>
+          <text x="417.0" y="428" font-size="14.5" class="bold black" text-anchor="middle">0</text>
+        </g>
+        <g id="features-entity-slot-mask-cells">
+          <rect x="443" y="408.5" width="42" height="29.5" fill="#fff" stroke="#1175cf" stroke-width="1.15"/>
+          <text x="464.0" y="428" font-size="14.5" text-anchor="middle" fill="#2e5692" font-weight="400" style="fill:#2e5692">0</text>
+          <rect x="485" y="408.5" width="40" height="29.5" fill="#fff" stroke="#1175cf" stroke-width="1.15"/>
+          <text x="505.0" y="428" font-size="14.5" text-anchor="middle" fill="#2e5692" font-weight="400" style="fill:#2e5692">1</text>
+          <rect x="525" y="408.5" width="42" height="29.5" fill="#fff" stroke="#1175cf" stroke-width="1.15"/>
+          <text x="546.0" y="428" font-size="14.5" text-anchor="middle" fill="#080a09" font-weight="700" style="fill:#080a09">1</text>
+          <rect x="567" y="408.5" width="42" height="29.5" fill="#fff" stroke="#1175cf" stroke-width="1.15"/>
+          <text x="588.0" y="428" font-size="14.5" text-anchor="middle" fill="#080a09" font-weight="700" style="fill:#080a09">0</text>
+          <rect x="609" y="408.5" width="44" height="29.5" fill="#fff" stroke="#1175cf" stroke-width="1.15"/>
+          <text x="631.0" y="428" font-size="14.5" text-anchor="middle" fill="#080a09" font-weight="700" style="fill:#080a09">1</text>
+          <rect x="653" y="408.5" width="46" height="29.5" fill="#fff" stroke="#1175cf" stroke-width="1.15"/>
+          <text x="676.0" y="428" font-size="14.5" text-anchor="middle" fill="#080a09" font-weight="700" style="fill:#080a09">...</text>
+        </g>
+        <line x1="93" y1="380" x2="93" y2="438" stroke="#7baed5" stroke-width="1"/>
+        <line x1="441.5" y1="380" x2="441.5" y2="438" stroke="#4fa5f2" stroke-width="1"/>
+        <rect x="17" y="440" width="690" height="15" rx="3" fill="#fff" fill-opacity="0.88"/>
+        <path d="M58.5 463 V443" class="navy-arrow" id="features-cls-mask-note-arrow" stroke-width="1.15" marker-end="url(#features-arrow-small-black)" style="stroke-width:1.15;marker-end:url(#features-arrow-small-black)"/>
+        <path d="M113 443 Q113 451.5 120 451.5 H260 Q267 451.5 267 457 Q267 451.5 275 451.5 H411 Q419 451.5 419 444" class="brace"/>
+        <path d="M457 444 Q457 455.5 464 455.5 H502 Q509 455.5 509 461 Q509 455.5 516 455.5 H552 Q559 455.5 559 444" class="brace"/>
+        <path d="M588 444 Q588 454.5 595 454.5 H634 Q641 454.5 641 461 Q641 454.5 649 454.5 H687 Q694 454.5 694 444" class="brace"/>
+        <text x="0" y="0" font-size="13.5" text-anchor="middle" transform="translate(58.5 476.5) scale(0.88187 1)">(CLS) is</text>
+        <text x="0" y="0" font-size="13.5" text-anchor="middle" transform="translate(58.5 494) scale(0.97541 1)">always valid</text>
+        <text x="0" y="0" font-size="13.8" text-anchor="middle" transform="translate(266.5 476.5) scale(1.07473 1)">all global scalar tokens</text>
+        <text x="0" y="0" font-size="13.8" text-anchor="middle" transform="translate(266.5 494) scale(1.01874 1)">are always valid</text>
+        <text x="0" y="0" font-size="13.5" text-anchor="middle" transform="translate(507.5 477) scale(0.96613 1)">real entity slots</text>
+        <text x="0" y="0" font-size="13.5" text-anchor="middle" transform="translate(507.5 495) scale(0.92379 1)">have mask value 0</text>
+        <text x="0" y="0" font-size="13.5" text-anchor="middle" transform="translate(641 477) scale(0.99712 1)">empty entity slots</text>
+        <text x="0" y="0" font-size="13.5" text-anchor="middle" transform="translate(641 495) scale(0.93267 1)">have mask value 1</text>
+      </g>
+      <g id="features-entity-token-construction">
+        <rect x="24.5" y="541" width="513" height="280.5" rx="6" fill="#effaff" fill-opacity="0.4" stroke="#70b8ff" stroke-width="1.05"/>
+        <text x="0" y="0" font-size="15" class="bold" transform="translate(29.5 560) scale(0.95112 1)">Entity token construction</text>
+        <text x="0" y="0" font-size="13.3" transform="translate(206 560) scale(0.95669 1)">(one example entity token)</text>
+        <g id="features-content-features">
+          <rect x="29.5" y="569" width="208.5" height="191.5" rx="6" fill="none" stroke="#6eb8f8" stroke-width="1"/>
+          <text x="0" y="0" font-size="12" class="bold" transform="translate(34 586) scale(0.91437 1)" fill="#003fff" style="fill:#003fff">content features (card-dependent)</text>
+          <g id="features-card-type-feature">
+            <rect x="35.2" y="596" width="74.5" height="22.5" rx="3" class="feature-box"/>
+            <text x="72.5" y="611.5" font-size="12" text-anchor="middle">type</text>
+            <line x1="110.5" y1="606.5" x2="122" y2="606.5" class="small-blue-arrow"/>
+            <text x="0" y="0" font-size="11.2" transform="translate(124 609.2) scale(0.85078 1)">card type embedding</text>
+          </g>
+          <g id="features-special-feature">
+            <rect x="35.2" y="622.5" width="74.5" height="22.5" rx="3" class="feature-box"/>
+            <text x="72.5" y="638.0" font-size="12" text-anchor="middle">special</text>
+            <line x1="110.5" y1="633.0" x2="122" y2="633.0" class="small-blue-arrow"/>
+            <text x="0" y="0" font-size="11.2" transform="translate(124 635.7) scale(0.84815 1)">special type projection</text>
+          </g>
+          <g id="features-mana-cost-feature">
+            <rect x="35.2" y="649" width="74.5" height="22.5" rx="3" class="feature-box"/>
+            <text x="72.5" y="664.5" font-size="12" text-anchor="middle">cost</text>
+            <line x1="110.5" y1="659.5" x2="122" y2="659.5" class="small-blue-arrow"/>
+            <text x="0" y="0" font-size="11.2" transform="translate(124 662.2) scale(0.86115 1)">mana cost projection</text>
+          </g>
+          <g id="features-color-feature">
+            <rect x="35.2" y="675.5" width="74.5" height="22.5" rx="3" class="feature-box"/>
+            <text x="72.5" y="691.0" font-size="12" text-anchor="middle">color</text>
+            <line x1="110.5" y1="686.0" x2="122" y2="686.0" class="small-blue-arrow"/>
+            <text x="0" y="0" font-size="11.2" transform="translate(124 688.7) scale(0.89425 1)">color-identity projection</text>
+          </g>
+          <g id="features-combat-stats-feature">
+            <rect x="35.2" y="702" width="74.5" height="22.5" rx="3" class="feature-box"/>
+            <text x="0" y="0" font-size="12" text-anchor="middle" transform="translate(72.5 717.5) scale(0.89752 1)">atk / hp / stats</text>
+            <line x1="110.5" y1="712.5" x2="122" y2="712.5" class="small-blue-arrow"/>
+            <text x="0" y="0" font-size="11.2" transform="translate(124 715.2) scale(0.81046 1)">attack / hp / state projection</text>
+          </g>
+          <g id="features-attacker-feature">
+            <rect x="35.2" y="728.5" width="74.5" height="22.5" rx="3" class="feature-box"/>
+            <text x="72.5" y="744.0" font-size="12" text-anchor="middle">attacker</text>
+            <line x1="110.5" y1="739.0" x2="122" y2="739.0" class="small-blue-arrow"/>
+            <text x="0" y="0" font-size="11.2" transform="translate(124 741.7) scale(0.84367 1)">attacker embedding</text>
+          </g>
+        </g>
+        <g id="features-structural-features">
+          <rect x="242" y="569" width="199.2" height="168.5" rx="6" fill="none" stroke="#667bb0" stroke-width="1.05"/>
+          <text x="0" y="0" font-size="11.7" transform="translate(246 586) scale(0.93495 1)" fill="#063fbd" style="fill:#063fbd">structural features (position-dependent)</text>
+          <g id="features-zone-feature">
+            <rect x="246.7" y="598" width="72.8" height="22.8" rx="3" class="feature-box"/>
+            <text x="283" y="613.5" font-size="12" text-anchor="middle">zone</text>
+            <line x1="320.5" y1="609" x2="332.5" y2="609" class="small-blue-arrow"/>
+            <text x="0" y="0" font-size="11" transform="translate(335.5 611.5) scale(0.84808 1)">zone embedding</text>
+          </g>
+          <g id="features-kind-feature">
+            <rect x="246.7" y="625.5" width="72.8" height="22.8" rx="3" class="feature-box"/>
+            <text x="283" y="641.0" font-size="12" text-anchor="middle">kind</text>
+            <line x1="320.5" y1="636.5" x2="332.5" y2="636.5" class="small-blue-arrow"/>
+            <text x="0" y="0" font-size="11" transform="translate(335.5 639.0) scale(0.87539 1)">kind embedding</text>
+          </g>
+          <g id="features-owner-feature">
+            <rect x="246.7" y="653" width="72.8" height="22.8" rx="3" class="feature-box"/>
+            <text x="283" y="668.5" font-size="12" text-anchor="middle">owner</text>
+            <line x1="320.5" y1="664" x2="332.5" y2="664" class="small-blue-arrow"/>
+            <text x="0" y="0" font-size="11" transform="translate(335.5 666.5) scale(0.89184 1)">owner embedding</text>
+          </g>
+          <g id="features-slot-feature">
+            <rect x="246.7" y="680.5" width="72.8" height="22.8" rx="3" class="feature-box"/>
+            <text x="283" y="696.0" font-size="12" text-anchor="middle">slot</text>
+            <line x1="320.5" y1="691.5" x2="332.5" y2="691.5" class="small-blue-arrow"/>
+            <text x="0" y="0" font-size="11" transform="translate(335.5 694.0) scale(0.88448 1)">slot embedding</text>
+          </g>
+        </g>
+        <g id="features-entity-feature-sum">
+          <path d="M133.75 760.5 V786 H329" class="navy-arrow" id="features-content-features-to-sum" stroke-linejoin="round"/>
+          <path d="M341.6 737.5 V773.4" class="navy-arrow" id="features-structural-features-to-sum"/>
+          <circle id="features-entity-feature-add" cx="341.6" cy="786" r="12.6" fill="#f0fbff" stroke="#141743" stroke-width="2.2"/>
+          <path d="M335.9 786 H347.3 M341.6 780.3 V791.7" stroke="#171743" stroke-width="2"/>
+          <path d="M354.2 786 H475.5" class="navy-arrow" id="features-feature-sum-to-entity-token"/>
+          <rect x="477.5" y="761.75" width="53.2" height="48.5" rx="3" class="scalar-box" id="features-constructed-entity-token"/>
+          <text x="0" y="0" font-size="15.5" text-anchor="middle" transform="translate(504.1 783) scale(0.91768 1)">entity</text>
+          <text x="0" y="0" font-size="15.5" text-anchor="middle" transform="translate(504.1 800.8) scale(0.87025 1)">token</text>
+        </g>
+        <text x="0" y="0" font-size="14" text-anchor="middle" transform="translate(264 813) scale(1.02298 1)">content features + structural embeddings</text>
+      </g>
+      <g id="features-transformer-encoder">
+        <rect x="601.5" y="552.5" width="342" height="126" rx="6" class="scalar-box" id="features-transformer-block" stroke="#185cff" stroke-width="1.65" style="stroke:#185cff;stroke-width:1.65"/>
+        <text x="0" y="0" font-size="20.5" class="bold" transform="translate(677 577) scale(0.91628 1)">Transformer Encoder</text>
+        <g id="features-self-attention-matrix">
+          <rect x="682.6" y="590.3" width="11.1" height="11.45" fill="#009af6" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="693.7" y="590.3" width="11.1" height="11.45" fill="#82d1ff" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="704.8" y="590.3" width="11.1" height="11.45" fill="#d5f1ff" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="715.9" y="590.3" width="11.1" height="11.45" fill="#d8f2ff" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="727.0" y="590.3" width="11.1" height="11.45" fill="#ecfaff" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="738.1" y="590.3" width="11.1" height="11.45" fill="#f0fbff" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="749.2" y="590.3" width="11.1" height="11.45" fill="#f2fcff" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="682.6" y="601.75" width="11.1" height="11.45" fill="#8ad4ff" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="693.7" y="601.75" width="11.1" height="11.45" fill="#008cf0" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="704.8" y="601.75" width="11.1" height="11.45" fill="#8ad3ff" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="715.9" y="601.75" width="11.1" height="11.45" fill="#bee9ff" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="727.0" y="601.75" width="11.1" height="11.45" fill="#e0f5ff" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="738.1" y="601.75" width="11.1" height="11.45" fill="#e9f9ff" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="749.2" y="601.75" width="11.1" height="11.45" fill="#f4fcff" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="682.6" y="613.2" width="11.1" height="11.45" fill="#a4e1ff" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="693.7" y="613.2" width="11.1" height="11.45" fill="#80d1ff" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="704.8" y="613.2" width="11.1" height="11.45" fill="#008eea" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="715.9" y="613.2" width="11.1" height="11.45" fill="#8ed7ff" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="727.0" y="613.2" width="11.1" height="11.45" fill="#c8eeff" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="738.1" y="613.2" width="11.1" height="11.45" fill="#e9faff" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="749.2" y="613.2" width="11.1" height="11.45" fill="#f2fcff" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="682.6" y="624.65" width="11.1" height="11.45" fill="#b4e8ff" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="693.7" y="624.65" width="11.1" height="11.45" fill="#b2e7ff" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="704.8" y="624.65" width="11.1" height="11.45" fill="#92d8ff" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="715.9" y="624.65" width="11.1" height="11.45" fill="#058dea" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="727.0" y="624.65" width="11.1" height="11.45" fill="#b2e8ff" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="738.1" y="624.65" width="11.1" height="11.45" fill="#dcf5ff" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="749.2" y="624.65" width="11.1" height="11.45" fill="#f5fcff" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="682.6" y="636.1" width="11.1" height="11.45" fill="#029af4" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="693.7" y="636.1" width="11.1" height="11.45" fill="#b9eaff" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="704.8" y="636.1" width="11.1" height="11.45" fill="#a1dfff" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="715.9" y="636.1" width="11.1" height="11.45" fill="#99deff" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="727.0" y="636.1" width="11.1" height="11.45" fill="#008eea" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="738.1" y="636.1" width="11.1" height="11.45" fill="#e3f6ff" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="749.2" y="636.1" width="11.1" height="11.45" fill="#f5fcff" stroke="#2883e8" stroke-width="0.7"/>
+          <rect x="682.6" y="590.3" width="77.7" height="57.25" fill="none" stroke="#1178ec" stroke-width="0.8"/>
+        </g>
+        <line x1="803.6" y1="590.3" x2="803.6" y2="668" stroke="#2984cf" stroke-width="1.15"/>
+        <circle cx="803.6" cy="590.3" r="1.35" fill="#263258"/>
+        <text x="0" y="0" font-size="13.1" text-anchor="middle" transform="translate(719 659.5) scale(1.03958 1)">self-attention</text>
+        <text x="0" y="0" font-size="13.1" class="bold" text-anchor="middle" transform="translate(719 673) scale(0.88106 1)">(over valid tokens)</text>
+        <text x="0" y="0" font-size="14.5" transform="translate(834.5 612.5) scale(0.94563 1)">2 layers</text>
+        <text x="0" y="0" font-size="14.5" transform="translate(834.5 632) scale(0.96937 1)">4 heads</text>
+        <text x="0" y="0" font-size="14.5" transform="translate(834.5 651) scale(0.90333 1)">d_model = 128</text>
+      </g>
+      <g id="features-entity-encoder-outputs">
+        <path d="M773 679 V697" class="navy-arrow" id="features-transformer-to-token-sequence"/>
+        <path d="M623.5 679 V697" class="navy-arrow" id="features-transformer-to-global-embedding"/>
+        <text x="0" y="0" font-size="14" class="bold" text-anchor="middle" transform="translate(623.5 711.5) scale(0.88424 1)">[CLS]</text>
+        <text x="0" y="0" font-size="16" transform="translate(649 711.5) scale(0.93288 1)">contextualized token sequence</text>
+        <text x="866" y="711.5" class="math" font-size="18.5"><tspan font-style="italic">H</tspan><tspan baseline-shift="sub" font-size="12.95" font-style="italic">s</tspan></text>
+        <g id="features-contextualized-output-row">
+          <rect x="603.5" y="721.7" width="40" height="25" rx="3" class="vector-box" id="features-global-state-embedding"/>
+          <text x="623.5" y="740.2" class="math" font-size="20" text-anchor="middle"><tspan font-style="italic">h</tspan><tspan baseline-shift="sub" font-size="14" font-style="italic">s</tspan></text>
+          <g id="features-contextualized-hand-token">
+            <rect x="650" y="721.7" width="85" height="25" rx="2" class="token-frame"/>
+            <rect x="653.0" y="724.7" width="17" height="19" class="matrix-cell"/>
+            <rect x="671.5" y="724.7" width="17" height="19" class="matrix-cell"/>
+            <rect x="690.0" y="724.7" width="17" height="19" class="matrix-cell"/>
+            <text x="725" y="737.95" font-size="16" text-anchor="middle">···</text>
+          </g>
+          <g id="features-contextualized-library-token">
+            <rect x="737.5" y="721.7" width="68.5" height="25" rx="2" class="token-frame"/>
+            <rect x="740.5" y="724.7" width="18" height="19" class="matrix-cell"/>
+            <rect x="760.0" y="724.7" width="18" height="19" class="matrix-cell"/>
+            <text x="796.0" y="737.95" font-size="16" text-anchor="middle">···</text>
+          </g>
+          <g id="features-contextualized-next-token">
+            <rect x="809" y="721.7" width="82" height="25" rx="2" class="token-frame"/>
+            <rect x="812.0" y="724.7" width="19" height="19" class="matrix-cell"/>
+            <rect x="832.5" y="724.7" width="19" height="19" class="matrix-cell"/>
+            <text x="881" y="737.95" font-size="16" text-anchor="middle">···</text>
+          </g>
+        </g>
+        <text x="679" y="782" class="math" font-size="15"><tspan font-style="italic">h</tspan><tspan baseline-shift="sub" font-size="10.5" font-style="italic">s</tspan></text>
+        <text x="0" y="0" font-size="13.3" transform="translate(698 782) scale(0.97954 1)">= global state embedding</text>
+        <text x="679" y="800" class="math" font-size="15"><tspan font-style="italic">H</tspan><tspan baseline-shift="sub" font-size="10.5" font-style="italic">s</tspan></text>
+        <text x="0" y="0" font-size="13.3" transform="translate(699 800) scale(0.99834 1)">= complete entity-token sequence</text>
+        <rect x="634.8" y="807.5" width="315" height="24.5" rx="4" fill="#d0eeff" stroke="#79c3fa" stroke-width="0.85"/>
+        <text x="0" y="0" font-size="16.5" class="bold" transform="translate(723 825.5) scale(0.93132 1)">Outputs:</text>
+        <text x="798" y="825.5" class="math" font-size="18"><tspan font-style="italic">h</tspan><tspan baseline-shift="sub" font-size="12.6" font-style="italic">s</tspan><tspan>, </tspan><tspan font-style="italic">H</tspan><tspan baseline-shift="sub" font-size="12.6" font-style="italic">s</tspan></text>
+      </g>
+    </g>
+    <g id="features-panel-b">
+      <rect x="974" y="50.3" width="674.4" height="526.7" rx="10" id="features-panel-b-background" fill="url(#features-panel-green)" stroke="#009421" stroke-width="1.5"/>
+      <text x="0" y="0" font-size="26" class="bold black" transform="translate(986.5 79.3) scale(0.89424 1)" id="features-panel-b-title">(c.2) Card State Encoder and Card Fusion</text>
+      <g id="features-card-text-branch">
+        <text x="0" y="0" font-size="18" class="bold black" transform="translate(986.5 117.5) scale(0.89179 1)">Text branch (card description)</text>
+        <g id="features-card-description-document">
+          <path d="M1030 144.5 H1058.5 L1069 155 V193 Q1069 196.8 1065.5 196.8 H1030 Q1026.6 196.8 1026.6 193 V148 Q1026.6 144.5 1030 144.5Z" fill="#fff" stroke="#101310" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M1058.5 144.5 V155 H1069" stroke="#101310" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M1035 158 H1047 M1035 167 H1059 M1035 176 H1059 M1035 185 H1059" stroke="#161916" stroke-width="2.25"/>
+        </g>
+        <text x="0" y="0" font-size="14" class="black" text-anchor="middle" transform="translate(1047.5 217) scale(0.97117 1)">card description</text>
+        <text x="1047.5" y="233" font-size="14" class="black" text-anchor="middle">text</text>
+        <line x1="1084" y1="178.5" x2="1123.5" y2="178.5" class="black-arrow" id="features-description-to-text-encoder"/>
+        <rect x="1129.2" y="144.5" width="123.9" height="67.5" rx="5.5" class="green-box" id="features-jina-text-encoder"/>
+        <text x="0" y="0" font-size="16" class="bold black" text-anchor="middle" transform="translate(1191 175) scale(0.89400 1)">Jina Text</text>
+        <text x="0" y="0" font-size="16" class="black" text-anchor="middle" transform="translate(1191 193) scale(1.02349 1)">Encoder</text>
+        <line x1="1253.5" y1="178.5" x2="1293" y2="178.5" class="black-arrow" id="features-text-encoder-to-embedding"/>
+        <text x="1288" y="154" class="math" font-size="19"><tspan font-style="normal">h</tspan><tspan baseline-shift="sub" font-size="13.3" font-style="normal">text</tspan><tspan font-style="normal" font-weight="400"> ∈ ℝ</tspan><tspan font-style="normal" font-weight="400" baseline-shift="super" font-size="12.92">128</tspan></text>
+        <g id="features-text-embedding">
+          <rect x="1300.3" y="165.5" width="62.2" height="26.7" rx="2.5" class="vector-box"/>
+          <line x1="1321.03" y1="166.2" x2="1321.03" y2="191.5" stroke="#8634ff" stroke-width="1.2"/>
+          <line x1="1341.77" y1="166.2" x2="1341.77" y2="191.5" stroke="#8634ff" stroke-width="1.2"/>
+        </g>
+        <path d="M1370 178.5 H1388.3 V281 H1417" class="black-arrow" id="features-text-embedding-to-fusion"/>
+      </g>
+      <g id="features-structured-attribute-branch">
+        <text x="0" y="0" font-size="18" class="bold black" transform="translate(986.5 294.2) scale(0.97846 1)">Structured attribute branch</text>
+        <text x="0" y="0" font-size="13.5" class="black" transform="translate(983.2 321.2) scale(0.96418 1)">structured card attributes</text>
+        <g id="features-structured-card-attributes">
+          <rect x="988" y="323.5" width="120" height="219.5" rx="6" fill="#f2fff3" stroke="#5da767" stroke-width="1"/>
+          <rect x="989.5" y="328" width="113.8" height="25.7" rx="3" class="attribute-box"/>
+          <text x="0" y="0" font-size="13" class="black" text-anchor="middle" transform="translate(1046.4 345.5) scale(0.95381 1)">card type</text>
+          <rect x="989.5" y="358.5" width="113.8" height="25.7" rx="3" class="attribute-box"/>
+          <text x="0" y="0" font-size="13" class="black" text-anchor="middle" transform="translate(1046.4 376.0) scale(0.93227 1)">special type</text>
+          <rect x="989.5" y="389" width="113.8" height="25.7" rx="3" class="attribute-box"/>
+          <text x="0" y="0" font-size="13" class="black" text-anchor="middle" transform="translate(1046.4 406.5) scale(0.96715 1)">mana cost</text>
+          <rect x="989.5" y="419.5" width="113.8" height="25.7" rx="3" class="attribute-box"/>
+          <text x="0" y="0" font-size="13" class="black" text-anchor="middle" transform="translate(1046.4 437.0) scale(0.98657 1)">color identity</text>
+          <rect x="989.5" y="450.5" width="113.8" height="25.7" rx="3" class="attribute-box"/>
+          <text x="1046.4" y="468.0" font-size="13" class="black" text-anchor="middle">attack</text>
+          <rect x="989.5" y="481.5" width="113.8" height="25.7" rx="3" class="attribute-box"/>
+          <text x="1046.4" y="499.0" font-size="13" class="black" text-anchor="middle">defense</text>
+          <rect x="989.5" y="512.5" width="113.8" height="25.7" rx="3" class="attribute-box"/>
+          <text x="0" y="0" font-size="13" class="black" text-anchor="middle" transform="translate(1046.4 530.0) scale(0.94959 1)">has combat state</text>
+        </g>
+        <line x1="1108" y1="424.5" x2="1131" y2="424.5" class="black-arrow" id="features-attributes-to-state-encoder"/>
+        <g id="features-card-state-encoder">
+          <rect x="1131.8" y="323.5" width="167" height="215" rx="6" class="green-box"/>
+          <text x="0" y="0" font-size="16.2" class="bold black" transform="translate(1151.3 346) scale(0.89848 1)">CardStateEncoder</text>
+          <g id="features-card-state-operation-1">
+            <rect x="1138.3" y="358.5" width="154.2" height="23.5" rx="4" class="operation-box"/>
+            <text x="0" y="0" font-size="12.3" class="black" transform="translate(1142.5 374.9) scale(0.96184 1)">card type = Embedding</text>
+          </g>
+          <g id="features-card-state-operation-2">
+            <rect x="1138.3" y="388" width="154.2" height="23.5" rx="4" class="operation-box"/>
+            <text x="0" y="0" font-size="12.3" class="black" transform="translate(1142.5 404.4) scale(1.00710 1)">special type = MLP</text>
+          </g>
+          <g id="features-card-state-operation-3">
+            <rect x="1138.3" y="417.5" width="154.2" height="23.5" rx="4" class="operation-box"/>
+            <text x="0" y="0" font-size="12.3" class="black" transform="translate(1142.5 433.9) scale(0.98897 1)">mana cost = MLP</text>
+          </g>
+          <g id="features-card-state-operation-4">
+            <rect x="1138.3" y="447" width="154.2" height="23.5" rx="4" class="operation-box"/>
+            <text x="0" y="0" font-size="12.3" class="black" transform="translate(1142.5 463.4) scale(1.03359 1)">color identity = MLP</text>
+          </g>
+          <g id="features-card-state-operation-5">
+            <rect x="1138.3" y="476.5" width="154.2" height="23.5" rx="4" class="operation-box"/>
+            <text x="0" y="0" font-size="12.3" class="black" transform="translate(1142.5 492.9) scale(0.83895 1)">attack + defense = Combat MLP</text>
+          </g>
+          <g id="features-card-state-operation-6">
+            <rect x="1138.3" y="505.5" width="154.2" height="23.5" rx="4" class="operation-box"/>
+            <text x="0" y="0" font-size="12.3" class="black" transform="translate(1142.5 521.9) scale(0.83095 1)">has combat = Binary Embedding</text>
+          </g>
+        </g>
+        <line x1="1299.5" y1="393" x2="1318" y2="393" class="black-arrow" id="features-state-encoder-to-embedding"/>
+        <text x="1308" y="354" class="math" font-size="19"><tspan font-style="normal">h</tspan><tspan baseline-shift="sub" font-size="13.3" font-style="normal">attr</tspan><tspan font-style="normal" font-weight="400"> ∈ ℝ</tspan><tspan font-style="normal" font-weight="400" baseline-shift="super" font-size="12.92">128</tspan></text>
+        <g id="features-attribute-embedding">
+          <rect x="1321.8" y="373.5" width="58.1" height="32.5" rx="2.5" class="vector-box"/>
+          <line x1="1341.17" y1="374.2" x2="1341.17" y2="405.3" stroke="#8634ff" stroke-width="1.2"/>
+          <line x1="1360.53" y1="374.2" x2="1360.53" y2="405.3" stroke="#8634ff" stroke-width="1.2"/>
+        </g>
+        <path d="M1385.5 393 H1402.5 V301 H1417" class="black-arrow" id="features-attribute-embedding-to-fusion"/>
+      </g>
+      <g id="features-card-fusion">
+        <rect x="1417.8" y="196.7" width="118.7" height="254.8" rx="7" class="green-box"/>
+        <text x="0" y="0" font-size="18.5" class="bold black" transform="translate(1431.8 223) scale(0.88539 1)">CardFusion</text>
+        <rect x="1423.7" y="240" width="106" height="24" rx="5.5" class="operation-box"/>
+        <text x="0" y="0" font-size="13.4" class="black" text-anchor="middle" transform="translate(1476.7 257) scale(0.98140 1)">normalize</text>
+        <rect x="1423.7" y="271.5" width="106" height="24" rx="5.5" class="operation-box"/>
+        <text x="0" y="0" font-size="13.4" class="black" text-anchor="middle" transform="translate(1476.7 288.5) scale(0.98644 1)">concatenate</text>
+        <rect x="1423.7" y="303" width="106" height="24" rx="5.5" class="operation-box"/>
+        <text x="0" y="0" font-size="13.4" class="black" text-anchor="middle" transform="translate(1476.7 320) scale(0.93362 1)">residual MLP</text>
+        <g id="features-residual-mlp">
+          <rect x="1423.9" y="334" width="105.3" height="108.5" rx="4.5" class="operation-box"/>
+          <path d="M1434.5 425.6 V356.8 H1446.5" class="small-black-arrow" id="features-residual-input-to-linear"/>
+          <path d="M1434.5 425.6 H1467" class="small-black-arrow" id="features-residual-left-skip"/>
+          <path d="M1476.5 342 V338.8 H1519 V425.6 H1486" class="small-black-arrow" id="features-residual-right-skip"/>
+          <rect x="1447" y="344" width="59.1" height="25.4" rx="1" id="features-residual-linear-1" fill="#ecffef" stroke="#586b56" stroke-width="1.15"/>
+          <text x="0" y="0" font-size="13.3" class="black" text-anchor="middle" transform="translate(1476.6 361.4) scale(0.97350 1)">Linear</text>
+          <line x1="1476.5" y1="369.4" x2="1476.5" y2="379" class="small-black-arrow"/>
+          <rect x="1447" y="380" width="59.1" height="25.1" rx="1" id="features-residual-linear-2" fill="#edfff0" stroke="#586b56" stroke-width="1.15"/>
+          <text x="0" y="0" font-size="13.3" class="black" text-anchor="middle" transform="translate(1476.6 397.4) scale(0.97350 1)">Linear</text>
+          <line x1="1476.5" y1="405.1" x2="1476.5" y2="416.5" class="small-black-arrow"/>
+          <circle id="features-residual-add" cx="1476.6" cy="425.6" r="8.9" fill="#f1fff4" stroke="#161c17" stroke-width="1.8"/>
+          <path d="M1471.8 425.6 H1481.4 M1476.6 420.8 V430.4" stroke="#141a16" stroke-width="1.6"/>
+          <line x1="1476.6" y1="434.5" x2="1476.6" y2="442" class="small-black-arrow"/>
+        </g>
+      </g>
+      <g id="features-card-encoder-output">
+        <line x1="1476.6" y1="452" x2="1476.6" y2="490.5" class="black-arrow" id="features-fusion-to-card-embedding"/>
+        <g id="features-card-embedding">
+          <rect x="1445.35" y="494.5" width="62.5" height="32" rx="2.5" class="vector-box"/>
+          <line x1="1466.18" y1="495.2" x2="1466.18" y2="525.8" stroke="#8634ff" stroke-width="1.2"/>
+          <line x1="1487.02" y1="495.2" x2="1487.02" y2="525.8" stroke="#8634ff" stroke-width="1.2"/>
+        </g>
+        <text x="1476.6" y="550" class="math" font-size="19" text-anchor="middle"><tspan font-style="normal">h</tspan><tspan baseline-shift="sub" font-size="13.3" font-style="normal">card</tspan><tspan font-style="normal" font-weight="400"> ∈ ℝ</tspan><tspan font-style="normal" font-weight="400" baseline-shift="super" font-size="12.92">128</tspan></text>
+      </g>
+    </g>
+    <g id="features-panel-c">
+      <rect x="974" y="592.4" width="674.4" height="243" rx="10" id="features-panel-c-background" fill="url(#features-panel-orange)" stroke="#ff6808" stroke-width="1.5"/>
+      <text x="0" y="0" font-size="26" class="bold black" transform="translate(986.5 624.4) scale(0.88705 1)" id="features-panel-c-title">(c.3) Action Encoder</text>
+      <g id="features-discrete-action-input">
+        <text x="0" y="0" font-size="14.2" class="bold black" transform="translate(986.5 680.4) scale(0.90719 1)">discrete action input</text>
+        <rect x="986.5" y="690.3" width="126" height="43.7" rx="3" class="orange-box"/>
+        <text x="997.5" y="717" class="math black" font-size="16.2" style="font-weight:400"><tspan font-style="italic">a</tspan><tspan baseline-shift="sub" font-size="11.4" font-style="italic">t</tspan><tspan> ∈ {1, …, 362}</tspan></text>
+        <line x1="1113" y1="712" x2="1132" y2="712" class="black-arrow"/>
+      </g>
+      <g id="features-action-embedding-network">
+        <rect x="1132.2" y="654.3" width="383.3" height="95.2" rx="5" fill="#ffe7cd" stroke="#ffa162" stroke-width="0.9"/>
+        <text x="0" y="0" font-size="14.4" class="bold" transform="translate(1138 674) scale(0.90344 1)" fill="#c71606" style="fill:#c71606">Action embedding network</text>
+        <g id="features-action-network-connections">
+          <line x1="1215.5" y1="712" x2="1227" y2="712" class="small-black-arrow"/>
+          <line x1="1305" y1="712" x2="1315" y2="712" class="small-black-arrow"/>
+          <line x1="1370.5" y1="712" x2="1382" y2="712" class="small-black-arrow"/>
+          <line x1="1439.5" y1="712" x2="1452" y2="712" class="small-black-arrow"/>
+        </g>
+        <g id="features-action-embedding-lookup">
+          <rect x="1138.3" y="686.6" width="77" height="51.5" rx="4" class="orange-box"/>
+          <text x="0" y="0" font-size="13.1" class="bold black" text-anchor="middle" transform="translate(1176.8 709) scale(0.91139 1)">Embedding</text>
+          <text x="0" y="0" font-size="14" class="black" text-anchor="middle" transform="translate(1176.8 726.5) scale(1.00948 1)">(362)</text>
+        </g>
+        <g id="features-action-layer-normalization">
+          <rect x="1228.3" y="686.6" width="76.6" height="51.5" rx="4" class="orange-box"/>
+          <text x="0" y="0" font-size="13.3" class="black" text-anchor="middle" transform="translate(1266.6 717) scale(0.94239 1)">LayerNorm</text>
+        </g>
+        <g id="features-action-linear-1">
+          <rect x="1316.2" y="686.6" width="54" height="51.5" rx="4" class="orange-box"/>
+          <text x="0" y="0" font-size="13" class="black" text-anchor="middle" transform="translate(1343.2 717) scale(0.94079 1)">Linear</text>
+        </g>
+        <g id="features-action-gelu">
+          <rect x="1383.3" y="686.6" width="55.8" height="51.5" rx="4" class="orange-box"/>
+          <text x="0" y="0" font-size="13" class="black" text-anchor="middle" transform="translate(1411.2 717) scale(0.87571 1)">GELU</text>
+        </g>
+        <g id="features-action-linear-2">
+          <rect x="1453.2" y="686.6" width="56" height="51.5" rx="4" class="orange-box"/>
+          <text x="0" y="0" font-size="13" class="black" text-anchor="middle" transform="translate(1481.2 717) scale(0.94079 1)">Linear</text>
+        </g>
+      </g>
+      <g id="features-action-encoder-output">
+        <line x1="1516.5" y1="706.6" x2="1547" y2="706.6" class="black-arrow"/>
+        <text x="1537" y="675" class="math" font-size="19"><tspan font-style="normal">h</tspan><tspan baseline-shift="sub" font-size="13.3" font-style="normal">action</tspan><tspan font-style="normal" font-weight="400"> ∈ ℝ</tspan><tspan font-style="normal" font-weight="400" baseline-shift="super" font-size="12.92">128</tspan></text>
+        <g id="features-action-embedding">
+          <rect x="1554.3" y="688.7" width="62.1" height="32" rx="2.5" class="vector-box"/>
+          <line x1="1575.0" y1="689.4" x2="1575.0" y2="720.0" stroke="#8634ff" stroke-width="1.2"/>
+          <line x1="1595.7" y1="689.4" x2="1595.7" y2="720.0" stroke="#8634ff" stroke-width="1.2"/>
+        </g>
+      </g>
+    </g>
+    <g id="features-transition-model-outputs">
+      <rect x="8.5" y="846.3" width="1639.8" height="85.3" rx="9" id="features-outputs-background" fill="url(#features-panel-purple)" stroke="#8431ff" stroke-width="1.6"/>
+      <text x="0" y="0" font-size="18" class="bold" text-anchor="middle" transform="translate(827.5 866.3) scale(0.90498 1)" id="features-outputs-title">outputs used by the transition model</text>
+      <g id="features-output-global-state">
+        <rect x="371.8" y="874.8" width="135.8" height="28.5" rx="3.5" fill="url(#features-purple-fill)" fill-opacity="0.72" stroke="#8939ff" stroke-width="1.25"/>
+        <text x="439.7" y="895.5" class="math" font-size="20" text-anchor="middle"><tspan font-style="italic">h</tspan><tspan baseline-shift="sub" font-size="14" font-style="italic">s</tspan></text>
+        <text x="0" y="0" font-size="14.5" text-anchor="middle" transform="translate(439.7 923) scale(0.97775 1)">(global state embedding)</text>
+      </g>
+      <g id="features-output-entity-sequence">
+        <rect x="618.3" y="874.8" width="162.4" height="28.5" rx="3.5" fill="url(#features-purple-fill)" fill-opacity="0.72" stroke="#8939ff" stroke-width="1.25"/>
+        <text x="699.5" y="895.5" class="math" font-size="20" text-anchor="middle"><tspan font-style="italic">H</tspan><tspan baseline-shift="sub" font-size="14" font-style="italic">s</tspan></text>
+        <text x="0" y="0" font-size="14.5" text-anchor="middle" transform="translate(699.5 923) scale(0.98356 1)">(entity-token sequence)</text>
+      </g>
+      <g id="features-output-action">
+        <rect x="888.8" y="874.8" width="152.7" height="28.5" rx="3.5" fill="url(#features-purple-fill)" fill-opacity="0.72" stroke="#8939ff" stroke-width="1.25"/>
+        <text x="965.15" y="895.5" class="math" font-size="20" text-anchor="middle"><tspan font-style="italic">h</tspan><tspan baseline-shift="sub" font-size="14" font-style="normal">action</tspan></text>
+        <text x="0" y="0" font-size="14.5" text-anchor="middle" transform="translate(965.15 923) scale(0.99927 1)">(action embedding)</text>
+      </g>
+      <g id="features-output-card">
+        <rect x="1144.8" y="874.8" width="147.5" height="28.5" rx="3.5" fill="url(#features-purple-fill)" fill-opacity="0.72" stroke="#8939ff" stroke-width="1.25"/>
+        <text x="1218.55" y="895.5" class="math" font-size="20" text-anchor="middle"><tspan font-style="italic">h</tspan><tspan baseline-shift="sub" font-size="14" font-style="normal">card</tspan></text>
+        <text x="0" y="0" font-size="14.5" text-anchor="middle" transform="translate(1218.55 923) scale(0.97703 1)">(card embedding)</text>
+      </g>
+    </g>
+  </g>
+</svg>

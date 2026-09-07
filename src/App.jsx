@@ -25,7 +25,7 @@ function getInitialLanguage() {
     return "en";
   }
 
-  return window.navigator.language.toLowerCase().startsWith("zh") ? "zh" : "en";
+  return "en";
 }
 
 function ScrollToTop() {
@@ -316,10 +316,12 @@ function ProjectMediaGallery({ gallery, ui }) {
           <h2>{gallery.title}</h2>
           <p>{gallery.intro}</p>
         </div>
-        <div className="media-scroll-actions" aria-hidden="false">
-          <button type="button" aria-label={ui.scrollVideosLeft} onClick={() => scrollByPage(-1)}>←</button>
-          <button type="button" aria-label={ui.scrollVideosRight} onClick={() => scrollByPage(1)}>→</button>
-        </div>
+        {gallery.items.length > 1 ? (
+          <div className="media-scroll-actions">
+            <button type="button" aria-label={ui.scrollVideosLeft} onClick={() => scrollByPage(-1)}>←</button>
+            <button type="button" aria-label={ui.scrollVideosRight} onClick={() => scrollByPage(1)}>→</button>
+          </div>
+        ) : null}
       </div>
       <div className={gallery.items.length === 1 ? "media-scroller media-scroller--single" : "media-scroller"} ref={scrollerRef} tabIndex="0">
         {gallery.items.map((item) => <ProjectMediaCard key={item.id} item={item} ui={ui} />)}
