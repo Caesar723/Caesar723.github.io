@@ -352,7 +352,7 @@ function ReconstructionStatePanel({ state }) {
       <span>Opponent {state.opponentLife} · Self {state.selfLife}</span>
     </header>
     <div className="reconstruction-state-panel__zones">
-      {state.zones.map((zone) => <details className="reconstruction-zone" key={zone.name} open={zone.cards.length > 0}>
+      {state.zones.map((zone) => <details className="reconstruction-zone" key={zone.name}>
         <summary><span>{zone.name}</span><small>{zone.count}</small></summary>
         {zone.cards.length ? <div className="reconstruction-zone__cards">
           {zone.cards.map((card, index) => <article key={`${card.title}-${index}`}>
@@ -536,7 +536,7 @@ function SynthesisCanvas({ view }) {
       <span>{selectedSummary}</span>
       {!isReconstruction ? <>
         <p>{selectedPoint.card_used.description}</p>
-        <small>{selectedPoint.card_used.type} · {(selectedPoint.card_used.colors || []).join("") || "colourless"} · observed delta: {humanizeTransition(selectedPoint.state_delta.change_type)}</small>
+        <small>{selectedPoint.card_used.type} · {(selectedPoint.card_used.colors || []).join("") || "colourless"}</small>
       </> : null}
     </div> : null}
     {isReconstruction && selectedStateSnapshot ? <div className="reconstruction-state-comparison" aria-label="Current, predicted, and true next game states">
@@ -555,9 +555,14 @@ function ProjectSectionMediaItem({ item, ui }) {
   const isEmbed = item.kind === "embed";
   const isSynthesisCanvas = item.kind === "synthesis-canvas";
   const shouldRenderMedia = mediaSrc && !hasMediaError;
+  const caption = <figcaption className={isSynthesisCanvas ? "section-media__caption--top" : undefined}>
+    <strong>{item.title}</strong>
+    <span>{item.description}</span>
+  </figcaption>;
 
   return (
     <figure className="section-media">
+      {isSynthesisCanvas ? caption : null}
       <div className={`section-media__frame${isImage ? "" : isEmbed ? " section-media__frame--embed" : isSynthesisCanvas ? " section-media__frame--canvas" : " section-media__frame--video"}`}>
         {isSynthesisCanvas ? (
           <SynthesisCanvas view={item.view} />
@@ -590,10 +595,7 @@ function ProjectSectionMediaItem({ item, ui }) {
           </button>
         ) : null}
       </div>
-      <figcaption>
-        <strong>{item.title}</strong>
-        <span>{item.description}</span>
-      </figcaption>
+      {!isSynthesisCanvas ? caption : null}
     </figure>
   );
 }
@@ -611,6 +613,10 @@ function ProjectDetail({ content }) {
   const { slug } = useParams();
   const projectIndex = content.projects.findIndex((project) => project.slug === slug || project.aliases?.includes(slug));
   const project = content.projects[projectIndex];
+  const orderedSections = project.sections
+    .map((section, index) => ({ section, index }))
+    .sort((a, b) => (a.section.order ?? a.index) - (b.section.order ?? b.index))
+    .map(({ section }) => section);
 
   if (!project) return <Navigate to="/projects" replace />;
 
@@ -642,7 +648,7 @@ function ProjectDetail({ content }) {
       ) : null}
 
       <div className="project-body">
-        {project.sections.map((section) => (
+        {orderedSections.map((section) => (
           <section key={section.title}>
             <h2>{section.title}</h2>
             {section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}

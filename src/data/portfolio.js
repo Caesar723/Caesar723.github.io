@@ -87,6 +87,7 @@ export const projects = [
     ],
     sections: [
       {
+        order: 1,
         title: "Research Goal",
         paragraphs: [
           "Most card-game agents are built around a closed, fixed card set, which couples their action space tightly to known card identities. This project explores a different direction: learning action and state-transition representations that can describe varied card effects and game situations.",
@@ -94,6 +95,7 @@ export const projects = [
         ]
       },
       {
+        order: 2,
         title: "Two-Stage Training Plan",
         paragraphs: [
           "The project is deliberately separated into representation learning and decision learning. This avoids asking a reinforcement-learning policy to discover a useful action geometry from scratch in a large, compositional card-game action space."
@@ -105,6 +107,7 @@ export const projects = [
         ]
       },
       {
+        order: 3,
         title: "Stage 1 · Action-Conditioned Transition Model",
         paragraphs: [
           "The final Stage 1 implementation is a conditional variational autoencoder (CVAE) for structured, single-step card-game state transitions. It receives global game state, entities across nine game zones, card text and structured card attributes, the current action from 362 action classes, the played card, and Stack metadata.",
@@ -125,6 +128,7 @@ export const projects = [
         }]
       },
       {
+        order: 7,
         title: "Structured Synthesis and Entity Birth",
         paragraphs: [
           "Here, synthesis means reconstructing, predicting, and visualising structured game-state transitions—not image generation. The model predicts where existing cards move, how their attributes change, and whether an action introduces previously unseen entities such as summons or resolving spells.",
@@ -132,6 +136,7 @@ export const projects = [
         ]
       },
       {
+        order: 5,
         title: "Training-Score Trajectory",
         paragraphs: [
           "The original TensorBoard comparison of the four reconstruction/score runs. This is a training-history screenshot, not a held-out evaluation."
@@ -146,6 +151,7 @@ export const projects = [
         }]
       },
       {
+        order: 8,
         title: "Synthesis Visualisations",
         paragraphs: [
           "These interactive diagnostic views use the same 1,000 samples from specific_entity_birth_plan_zero_message_v01 at step 148,000. Read them in order: Reconstruction compares current state → Prior-predicted next state → true next state; Transition Plan asks how the action intends to change the state; Transition Space asks what next-state outcome structure the Prior considers plausible. The two PCA projections are computed independently, so their coordinates are not directly comparable. They are diagnostic evidence, not held-out evaluation."
@@ -161,20 +167,21 @@ export const projects = [
           {
             id: "generalizable-card-game-ai-transition-plan-viewer",
             title: "Transition Plan",
-            description: "All 1,000 deterministic 4-token plan vectors (mean-pooled before PCA). This is the model's explicit intermediate plan—how it interprets the action and card effect before decoding a next state. Removal, graveyard operations and different summon / discard mechanisms separate because they imply different transition paths. Click a point to inspect its action, full card description and observed transition.",
+            description: "All 1,000 deterministic 4-token plan vectors (mean-pooled before PCA). This is the model's explicit intermediate plan—how it interprets the action and card effect before decoding a next state. Removal, graveyard operations and different summon / discard mechanisms separate because they imply different transition paths. Click a point to inspect its action and full card description.",
             kind: "synthesis-canvas",
             view: "transition-plan"
           },
           {
             id: "generalizable-card-game-ai-transition-space-viewer",
             title: "Transition Space",
-            description: "All 1,000 Prior-inference transition vectors. This is the model's possible-outcome representation before seeing the true next state. The central overlap is expected because several effects share similar end-state outcomes; combat damage and random / search-based entity generation remain broader because their result is uncertain. Click a point to inspect its action, full card description and observed transition.",
+            description: "All 1,000 Prior-inference transition vectors. This is the model's possible-outcome representation before seeing the true next state. The central overlap is expected because several effects share similar end-state outcomes; combat damage and random / search-based entity generation remain broader because their result is uncertain. Click a point to inspect its action and full card description.",
             kind: "synthesis-canvas",
             view: "transition-space"
           }
         ]
       },
       {
+        order: 4,
         title: "Four Major Architecture Iterations",
         paragraphs: [
           "The model evolved through four major versions, each addressing a limitation exposed by the previous transition representation. The score below is reconstruction/score = 1 / (1 + reconstruction loss); higher is better."
@@ -187,6 +194,7 @@ export const projects = [
         ]
       },
       {
+        order: 6,
         title: "Metric Scope",
         paragraphs: [
           "Each figure is the best contiguous 20-training-record rolling average found in the corresponding training log, rather than a single high-variance batch. It communicates the best sustained reconstruction level reached during training."
@@ -198,6 +206,7 @@ export const projects = [
         ]
       },
       {
+        order: 9,
         title: "Key References",
         paragraphs: [
           "The linked references above include Entropy 24(10), 1441, the work at arXiv:2206.12700, and Deep Reinforcement Learning in Large Discrete Action Spaces at arXiv:1512.07679. They inform the project’s representation-learning and planned policy-learning directions."
@@ -992,6 +1001,7 @@ const chineseProjectText = [
     linkLabels: ["Entropy 24(10), 1441", "参考文献 · arXiv:2206.12700", "大型离散动作 · arXiv:1512.07679"],
     sections: [
       {
+        order: 1,
         title: "研究目标",
         paragraphs: [
           "多数卡牌游戏 AI 面向封闭且固定的卡牌集合构建，动作空间与已知卡牌 ID 紧密绑定。本项目探索另一条路径：学习可以描述多样卡牌效果和游戏状态的动作表示与状态转移表示。",
@@ -999,6 +1009,7 @@ const chineseProjectText = [
         ]
       },
       {
+        order: 2,
         title: "两阶段训练计划",
         paragraphs: ["项目将表征学习和决策学习分开进行，避免让强化学习策略直接在大型、组合式卡牌动作空间中从零学习出有意义的动作几何结构。"],
         bullets: [
@@ -1008,6 +1019,7 @@ const chineseProjectText = [
         ]
       },
       {
+        order: 3,
         title: "阶段一 · 由动作条件控制的状态转移模型",
         paragraphs: [
           "最终实现是用于结构化、单步卡牌游戏状态转移的 Conditional Variational Autoencoder (CVAE)。输入包括全局游戏状态、九个游戏区域中的实体、卡牌文本及结构化属性、362 类当前动作、被使用的卡牌和 Stack 元数据。",
@@ -1028,6 +1040,7 @@ const chineseProjectText = [
         }]
       },
       {
+        order: 7,
         title: "结构化 Synthesis 与新实体生成",
         paragraphs: [
           "这里的 synthesis 指结构化游戏状态转移的重构、预测和可视化，并非图像生成。模型预测已有卡牌如何移动、属性如何变化，以及行动是否产生召唤物或结算法术等新的实体。",
@@ -1035,6 +1048,7 @@ const chineseProjectText = [
         ]
       },
       {
+        order: 5,
         title: "训练分数轨迹",
         paragraphs: ["四个 reconstruction/score run 的原始 TensorBoard 对比截图。这是训练历史，不是 held-out evaluation。"],
         media: [{
@@ -1047,6 +1061,7 @@ const chineseProjectText = [
         }]
       },
       {
+        order: 8,
         title: "Synthesis 可视化",
         paragraphs: ["下列交互式诊断图来自 specific_entity_birth_plan_zero_message_v01 的 step 148,000，使用同一批完整的 1,000 个样本。建议按顺序阅读：Reconstruction 对比 Current state → Prior-predicted next state → True next state；Transition Plan 回答“这个动作打算如何改变状态”；Transition Space 回答“在未看到真实下一状态时，Prior 认为结果可能落在哪些结构中”。两张 PCA 图是分别计算的，坐标不能直接比较；它们是诊断证据，而非 held-out evaluation。"],
         media: [
@@ -1060,20 +1075,21 @@ const chineseProjectText = [
           {
             id: "generalizable-card-game-ai-transition-plan-viewer",
             title: "Transition Plan",
-            description: "包含全部 1,000 个确定性的 4-token transition-plan vector（PCA 前先对 token 求均值）。这是模型在解码下一状态前显式生成的中间计划：它如何理解这次动作和卡牌效果将怎样改变状态。Remove、墓地操作及不同 Summon／Discard 机制更容易分离，因为它们对应不同的状态转移路径。点击任意点可查看动作、完整卡牌描述和观察到的状态转移。",
+            description: "包含全部 1,000 个确定性的 4-token transition-plan vector（PCA 前先对 token 求均值）。这是模型在解码下一状态前显式生成的中间计划：它如何理解这次动作和卡牌效果将怎样改变状态。Remove、墓地操作及不同 Summon／Discard 机制更容易分离，因为它们对应不同的状态转移路径。点击任意点可查看动作和完整卡牌描述。",
             kind: "synthesis-canvas",
             view: "transition-plan"
           },
           {
             id: "generalizable-card-game-ai-transition-space-viewer",
             title: "Transition Space",
-            description: "包含全部 1,000 个 Prior-inference transition vector。这是模型在未见真实下一状态时，对可能结果的表示。中心重叠是预期现象：多个效果会产生相似的最终状态；战斗伤害、随机／检索式实体生成因结果尚不确定而保留更宽的分布。点击任意点可查看动作、完整卡牌描述和观察到的状态转移。",
+            description: "包含全部 1,000 个 Prior-inference transition vector。这是模型在未见真实下一状态时，对可能结果的表示。中心重叠是预期现象：多个效果会产生相似的最终状态；战斗伤害、随机／检索式实体生成因结果尚不确定而保留更宽的分布。点击任意点可查看动作和完整卡牌描述。",
             kind: "synthesis-canvas",
             view: "transition-space"
           }
         ]
       },
       {
+        order: 4,
         title: "四次重大架构迭代",
         paragraphs: ["模型经历四个主要版本，每次迭代都针对上一版状态转移表示暴露出的限制。下列分数为 reconstruction/score = 1 / (1 + reconstruction loss)，数值越高越好。"],
         bullets: [
@@ -1084,6 +1100,7 @@ const chineseProjectText = [
         ]
       },
       {
+        order: 6,
         title: "指标口径与边界",
         paragraphs: ["每个数字均取对应训练日志中最佳连续 20 条训练记录的滚动平均，而非单个波动较大的 batch；它反映模型在训练中曾达到的最佳稳定重构水平。"],
         bullets: [
@@ -1093,6 +1110,7 @@ const chineseProjectText = [
         ]
       },
       {
+        order: 9,
         title: "主要参考论文",
         paragraphs: ["页面上方链接包括 Entropy 24(10), 1441、arXiv:2206.12700 的论文，以及 arXiv:1512.07679 的 Deep Reinforcement Learning in Large Discrete Action Spaces。这些工作启发了项目的表征学习和规划中的策略学习方向。"]
       }

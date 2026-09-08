@@ -338,7 +338,7 @@ li + li { margin-top: 5px; }
   scroll-snap-type: x mandatory;
 }
 .reconstruction-state-panel {
-  max-height: 365px;
+  max-height: 310px;
   overflow-y: auto;
   border: 1px solid rgba(255,255,255,.15);
   border-radius: 4px;
@@ -395,6 +395,7 @@ li + li { margin-top: 5px; }
 .section-media__play:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
 .section-media figcaption { display: grid; gap: 2px; margin-top: 8px; color: var(--muted); font-size: 13px; line-height: 1.45; }
 .section-media figcaption strong { color: var(--secondary); font-size: 13px; font-weight: 650; }
+.section-media__caption--top { margin: 0 0 8px !important; }
 .project-body > section:first-child h2 { margin-top: 0; }
 .project-body h2 { padding-top: 7px; }
 .project-pager { display: flex; justify-content: space-between; margin-top: 52px; padding-top: 20px; border-top: 1px solid var(--border); gap: 16px; font-size: 14px; font-weight: 600; }
