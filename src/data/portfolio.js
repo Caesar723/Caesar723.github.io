@@ -81,6 +81,7 @@ export const projects = [
     description: "Stage 1 is an action-conditioned state-transition model developed through four major architecture iterations. The Stage 2 large-action-space SAC policy remains a research proposal.",
     technologies: ["Python", "PyTorch", "CVAE", "Transformer", "Action Embeddings", "Hungarian Matching", "SAC (planned)"],
     links: [
+      { label: "Game Environment · GitHub", href: "https://github.com/Caesar723/Magic" },
       { label: "Entropy 24(10), 1441", href: "https://www.mdpi.com/1099-4300/24/10/1441" },
       { label: "Reference · arXiv:2206.12700", href: "https://arxiv.org/abs/2206.12700" },
       { label: "Large Discrete Actions · arXiv:1512.07679", href: "https://arxiv.org/abs/1512.07679" }
@@ -141,14 +142,30 @@ export const projects = [
         paragraphs: [
           "The original TensorBoard comparison of the four reconstruction/score runs. This is a training-history screenshot, not a held-out evaluation."
         ],
-        media: [{
-          id: "generalizable-card-game-ai-reconstruction-score",
-          title: "reconstruction/score Across the Four Major Versions",
-          description: "Original TensorBoard capture. The planned entity-birth model is shown in pink; higher is better: reconstruction/score = 1 / (1 + reconstruction loss).",
-          src: "images/generalizable-card-game-ai/reconstruction-score-tensorboard.png",
-          alt: "TensorBoard reconstruction score comparison across four major card-game AI versions.",
-          kind: "image"
-        }]
+        media: [
+          {
+            id: "generalizable-card-game-ai-training-summary",
+            title: "Stable Training Summary",
+            description: "Best contiguous 20-record rolling averages, rather than cherry-picked batches. P90 is calculated over each run's final 100 training records.",
+            kind: "training-stats",
+            labels: { version: "Version", best: "Best 20 avg", window: "Training window", peak: "Peak log", p90: "Final-100 P90", latest: "Latest plan_v01", high90: "≥ 0.9", high80: "≥ 0.8" },
+            stats: [
+              { version: "specific_v01", best: "0.2502", window: "100800–101180", peak: "0.3555", p90: "0.2850" },
+              { version: "entity_birth_v01", best: "0.6179", window: "166340–166720", peak: "0.8894", p90: "0.7268" },
+              { version: "entity_birth_v02", best: "0.6992", window: "123420–123800", peak: "0.9081", p90: "0.7725" },
+              { version: "birth_plan_v01", best: "0.8717", window: "168400–168780", peak: "0.9786", p90: "0.9250" }
+            ],
+            latest: { best: "0.8717", p90: "0.9250", peak: "0.9786", high90: "20%", high80: "42%" }
+          },
+          {
+            id: "generalizable-card-game-ai-reconstruction-score",
+            title: "reconstruction/score Across the Four Major Versions",
+            description: "Original TensorBoard capture. The planned entity-birth model is shown in pink; higher is better: reconstruction/score = 1 / (1 + reconstruction loss).",
+            src: "images/generalizable-card-game-ai/reconstruction-score-tensorboard.png",
+            alt: "TensorBoard reconstruction score comparison across four major card-game AI versions.",
+            kind: "image"
+          }
+        ]
       },
       {
         order: 8,
@@ -998,7 +1015,7 @@ const chineseProjectText = [
     },
     summary: "一个两阶段研究框架，目标是让卡牌游戏智能体能够理解多样的卡牌，而不是绑定在固定的卡牌集合上。",
     description: "第一阶段是历经四次重大架构迭代的、由动作条件控制的状态转移模型；第二阶段的大型动作空间 SAC 策略仍处于研究设计阶段。",
-    linkLabels: ["Entropy 24(10), 1441", "参考文献 · arXiv:2206.12700", "大型离散动作 · arXiv:1512.07679"],
+    linkLabels: ["游戏环境 · GitHub", "Entropy 24(10), 1441", "参考文献 · arXiv:2206.12700", "大型离散动作 · arXiv:1512.07679"],
     sections: [
       {
         order: 1,
@@ -1051,14 +1068,30 @@ const chineseProjectText = [
         order: 5,
         title: "训练分数轨迹",
         paragraphs: ["四个 reconstruction/score run 的原始 TensorBoard 对比截图。这是训练历史，不是 held-out evaluation。"],
-        media: [{
-          id: "generalizable-card-game-ai-reconstruction-score",
-          title: "四次重大版本的 reconstruction/score",
-          description: "原始 TensorBoard 截图：带 TransitionPlanner 的实体 birth 模型为粉色。数值越高越好：reconstruction/score = 1 / (1 + reconstruction loss)。",
-          src: "images/generalizable-card-game-ai/reconstruction-score-tensorboard.png",
-          alt: "四个主要版本的 TensorBoard reconstruction score 对比。",
-          kind: "image"
-        }]
+        media: [
+          {
+            id: "generalizable-card-game-ai-training-summary",
+            title: "稳定训练摘要",
+            description: "使用最佳连续 20 条训练记录的滚动平均，不挑选单个最高 batch；P90 取各 run 末期 100 条训练记录计算。",
+            kind: "training-stats",
+            labels: { version: "版本", best: "最佳连续 20 条均值", window: "对应训练区间", peak: "日志最高值", p90: "末期 100 条 P90", latest: "最新 plan_v01", high90: "≥ 0.9", high80: "≥ 0.8" },
+            stats: [
+              { version: "specific_v01", best: "0.2502", window: "100800–101180", peak: "0.3555", p90: "0.2850" },
+              { version: "entity_birth_v01", best: "0.6179", window: "166340–166720", peak: "0.8894", p90: "0.7268" },
+              { version: "entity_birth_v02", best: "0.6992", window: "123420–123800", peak: "0.9081", p90: "0.7725" },
+              { version: "birth_plan_v01", best: "0.8717", window: "168400–168780", peak: "0.9786", p90: "0.9250" }
+            ],
+            latest: { best: "0.8717", p90: "0.9250", peak: "0.9786", high90: "20%", high80: "42%" }
+          },
+          {
+            id: "generalizable-card-game-ai-reconstruction-score",
+            title: "四次重大版本的 reconstruction/score",
+            description: "原始 TensorBoard 截图：带 TransitionPlanner 的实体 birth 模型为粉色。数值越高越好：reconstruction/score = 1 / (1 + reconstruction loss)。",
+            src: "images/generalizable-card-game-ai/reconstruction-score-tensorboard.png",
+            alt: "四个主要版本的 TensorBoard reconstruction score 对比。",
+            kind: "image"
+          }
+        ]
       },
       {
         order: 8,

@@ -545,6 +545,59 @@ function SynthesisCanvas({ view }) {
   </>;
 }
 
+function TrainingStats({ item }) {
+  const highlights = [
+    [item.labels.best, item.latest.best],
+    [item.labels.p90, item.latest.p90],
+    [item.labels.peak, item.latest.peak],
+    [item.labels.high90, item.latest.high90],
+    [item.labels.high80, item.latest.high80]
+  ];
+
+  return (
+    <div className="training-stats" aria-label={item.title}>
+      <div className="training-stats__latest">
+        <div>
+          <span className="training-stats__eyebrow">{item.labels.latest}</span>
+          <strong>reconstruction/score</strong>
+        </div>
+        <dl className="training-stats__highlights">
+          {highlights.map(([label, value]) => (
+            <div key={label}>
+              <dt>{label}</dt>
+              <dd>{value}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+      <div className="training-stats__table-wrap" tabIndex="0" aria-label="Scrollable training score table">
+        <table className="training-stats__table">
+          <thead>
+            <tr>
+              <th scope="col">{item.labels.version}</th>
+              <th scope="col">{item.labels.best}</th>
+              <th scope="col">{item.labels.window}</th>
+              <th scope="col">{item.labels.peak}</th>
+              <th scope="col">{item.labels.p90}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {item.stats.map((stat) => (
+              <tr className={stat.version === "birth_plan_v01" ? "is-latest" : undefined} key={stat.version}>
+                <th scope="row">{stat.version}</th>
+                <td>{stat.best}</td>
+                <td>{stat.window}</td>
+                <td>{stat.peak}</td>
+                <td>{stat.p90}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 function ProjectSectionMediaItem({ item, ui }) {
   const [hasMediaError, setHasMediaError] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -554,6 +607,7 @@ function ProjectSectionMediaItem({ item, ui }) {
   const isImage = item.kind === "image" || item.type?.startsWith("image/");
   const isEmbed = item.kind === "embed";
   const isSynthesisCanvas = item.kind === "synthesis-canvas";
+  const isTrainingStats = item.kind === "training-stats";
   const shouldRenderMedia = mediaSrc && !hasMediaError;
   const caption = <figcaption className={isSynthesisCanvas ? "section-media__caption--top" : undefined}>
     <strong>{item.title}</strong>
@@ -563,9 +617,11 @@ function ProjectSectionMediaItem({ item, ui }) {
   return (
     <figure className="section-media">
       {isSynthesisCanvas ? caption : null}
-      <div className={`section-media__frame${isImage ? "" : isEmbed ? " section-media__frame--embed" : isSynthesisCanvas ? " section-media__frame--canvas" : " section-media__frame--video"}`}>
+      <div className={`section-media__frame${isImage ? "" : isEmbed ? " section-media__frame--embed" : isSynthesisCanvas ? " section-media__frame--canvas" : isTrainingStats ? " section-media__frame--training-stats" : " section-media__frame--video"}`}>
         {isSynthesisCanvas ? (
           <SynthesisCanvas view={item.view} />
+        ) : isTrainingStats ? (
+          <TrainingStats item={item} />
         ) : shouldRenderMedia && isEmbed ? (
           <iframe src={mediaSrc} title={item.title} loading="lazy" onError={() => setHasMediaError(true)} />
         ) : shouldRenderMedia && isImage ? (
@@ -588,7 +644,7 @@ function ProjectSectionMediaItem({ item, ui }) {
         ) : (
           <div className="section-media__placeholder">{ui.videoUnavailable}</div>
         )}
-        {shouldRenderMedia && !isImage && !isEmbed && !isSynthesisCanvas && !isPlaying ? (
+        {shouldRenderMedia && !isImage && !isEmbed && !isSynthesisCanvas && !isTrainingStats && !isPlaying ? (
           <button type="button" className="section-media__play" aria-label={`${ui.playVideo}: ${item.title}`} onClick={() => void videoRef.current?.play()}>
             <span aria-hidden="true">▶</span>
             <span>{ui.playVideo}</span>
