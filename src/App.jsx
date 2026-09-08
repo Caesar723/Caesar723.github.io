@@ -330,6 +330,221 @@ function ProjectMediaGallery({ gallery, ui }) {
   );
 }
 
+const transitionColors = {
+  remove: "#e5c646",
+  summon: "#4f8cc9",
+  discard: "#ef8a39",
+  opponent_damage: "#d5525a",
+  life_gain: "#4ba36d",
+  graveyard_change: "#8862b8",
+  draw: "#35a6a2",
+  mana_change: "#bf9a30",
+  no_major_change: "#858b91",
+  self_damage: "#b9538c"
+};
+
+const humanizeTransition = (value) => value.replaceAll("_", " ");
+
+function ReconstructionStatePanel({ state }) {
+  return <section className="reconstruction-state-panel">
+    <header>
+      <strong>{state.title}</strong>
+      <span>Opponent {state.opponentLife} · Self {state.selfLife}</span>
+    </header>
+    <div className="reconstruction-state-panel__zones">
+      {state.zones.map((zone) => <details className="reconstruction-zone" key={zone.name} open={zone.cards.length > 0}>
+        <summary><span>{zone.name}</span><small>{zone.count}</small></summary>
+        {zone.cards.length ? <div className="reconstruction-zone__cards">
+          {zone.cards.map((card, index) => <article key={`${card.title}-${index}`}>
+            <strong>{card.title}</strong>
+            {card.route ? <span className="reconstruction-zone__route">{card.route}</span> : null}
+            {card.stats.length ? <small>{card.stats.join(" · ")}</small> : null}
+            {card.tags.length ? <em>{card.tags.join(" · ")}</em> : null}
+          </article>)}
+        </div> : <p>Empty</p>}
+      </details>)}
+    </div>
+  </section>;
+}
+
+function SynthesisCanvas({ view }) {
+  const [points, setPoints] = useState(null);
+  const [stateSnapshots, setStateSnapshots] = useState(null);
+  const [loadError, setLoadError] = useState(false);
+  const [selectedSourceIndex, setSelectedSourceIndex] = useState(null);
+  const canvasRef = useRef(null);
+  const dataset = view === "transition-plan" ? "transition-plan" : "transition-space";
+  const isReconstruction = view === "reconstruction";
+  const isTransitionSpace = view === "transition-space";
+
+  useEffect(() => {
+    let active = true;
+    setPoints(null);
+    setStateSnapshots(null);
+    setLoadError(false);
+    fetch(assetUrl(`data/generalizable-card-game-ai/${dataset}.json`))
+      .then((response) => response.ok ? response.json() : Promise.reject(new Error("Unable to load snapshot")))
+      .then((data) => {
+        if (!active) return;
+        setPoints(data);
+        setSelectedSourceIndex(data.find((point) => point.is_highlighted)?.source_index ?? data[0]?.source_index ?? null);
+      })
+      .catch(() => { if (active) setLoadError(true); });
+    if (isReconstruction) {
+      fetch(assetUrl("data/generalizable-card-game-ai/reconstruction-states.json"))
+        .then((response) => response.ok ? response.json() : Promise.reject(new Error("Unable to load states")))
+        .then((data) => { if (active) setStateSnapshots(data.samples); })
+        .catch(() => { if (active) setLoadError(true); });
+    }
+    return () => { active = false; };
+  }, [dataset, isReconstruction]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !points) return undefined;
+    const baseWidth = 760;
+    const baseHeight = isReconstruction ? 260 : 390;
+    const getCoordinates = (point) => isTransitionSpace ? point.coordinates.prior : point;
+    const selectedPoint = points.find((point) => point.source_index === selectedSourceIndex) || points[0];
+    const draw = () => {
+      const cssWidth = canvas.clientWidth || baseWidth;
+      const scale = cssWidth / baseWidth;
+      const pixelRatio = window.devicePixelRatio || 1;
+      canvas.width = Math.round(cssWidth * pixelRatio);
+      canvas.height = Math.round(baseHeight * scale * pixelRatio);
+      canvas.style.height = `${baseHeight * scale}px`;
+      const context = canvas.getContext("2d");
+      context.setTransform(pixelRatio * scale, 0, 0, pixelRatio * scale, 0, 0);
+      context.fillStyle = "#242424";
+      context.fillRect(0, 0, baseWidth, baseHeight);
+
+      if (isReconstruction) {
+        const point = selectedPoint;
+        const card = point.card_used;
+        const score = point.reconstruction_scores?.prior ?? point.reconstruction_score ?? 0;
+        const random = /random/i.test(card.description || "");
+        const wrapText = (text, x, y, maxWidth, lineHeight, maxLines) => {
+          const words = text.split(/\s+/);
+          let line = "";
+          let lineIndex = 0;
+          words.forEach((word, index) => {
+            const candidate = line ? `${line} ${word}` : word;
+            if (context.measureText(candidate).width > maxWidth && line && lineIndex < maxLines - 1) {
+              context.fillText(line, x, y + lineIndex * lineHeight);
+              line = word;
+              lineIndex += 1;
+            } else if (lineIndex < maxLines) {
+              line = candidate;
+            }
+            if (index === words.length - 1 && lineIndex < maxLines) context.fillText(line, x, y + lineIndex * lineHeight);
+          });
+        };
+        context.fillStyle = transitionColors[point.state_delta.change_type] || "#858b91";
+        context.fillRect(0, 0, 10, baseHeight);
+        context.fillStyle = "#ffffff";
+        context.font = "700 20px system-ui, sans-serif";
+        context.fillText(`Sample #${point.reconstruction_sample_id} · ${humanizeTransition(point.state_delta.change_type)}`, 30, 42);
+        if (random) {
+          context.strokeStyle = "#fff";
+          context.lineWidth = 1.6;
+          context.beginPath(); context.arc(700, 35, 8, 0, Math.PI * 2); context.stroke();
+        }
+        context.fillStyle = "#d8d8d8";
+        context.font = "13px system-ui, sans-serif";
+        context.fillText(point.action.label, 30, 68);
+        context.fillStyle = "rgba(255,255,255,.11)";
+        context.fillRect(30, 90, 700, 1);
+        context.fillStyle = "#bdbdbd";
+        context.font = "600 11px system-ui, sans-serif";
+        context.fillText("CARD EFFECT", 30, 120);
+        context.fillStyle = "#f2f2f2";
+        context.font = "14px system-ui, sans-serif";
+        wrapText(card.description || "No card description", 30, 146, 680, 21, 4);
+        context.fillStyle = "#bdbdbd";
+        context.font = "12px system-ui, sans-serif";
+        context.fillText(`${card.type} · ${(card.colors || []).join("") || "colourless"} · prior reconstruction score ${score.toFixed(6)}`, 30, 238);
+        return;
+      }
+
+      const padding = { top: 24, right: 28, bottom: 48, left: 58 };
+      const xs = points.map((point) => getCoordinates(point).x);
+      const ys = points.map((point) => getCoordinates(point).y);
+      const minX = Math.min(...xs); const maxX = Math.max(...xs);
+      const minY = Math.min(...ys); const maxY = Math.max(...ys);
+      const scaleX = (x) => padding.left + ((x - minX) / (maxX - minX)) * (baseWidth - padding.left - padding.right);
+      const scaleY = (y) => baseHeight - padding.bottom - ((y - minY) / (maxY - minY)) * (baseHeight - padding.top - padding.bottom);
+      context.strokeStyle = "rgba(255,255,255,.23)";
+      context.lineWidth = 1;
+      [0.2, 0.4, 0.6, 0.8].forEach((ratio) => {
+        const x = padding.left + ratio * (baseWidth - padding.left - padding.right);
+        const y = padding.top + ratio * (baseHeight - padding.top - padding.bottom);
+        context.beginPath(); context.moveTo(x, padding.top); context.lineTo(x, baseHeight - padding.bottom); context.stroke();
+        context.beginPath(); context.moveTo(padding.left, y); context.lineTo(baseWidth - padding.right, y); context.stroke();
+      });
+      points.forEach((point) => {
+        const random = /random/i.test(point.card_used.description || "");
+        const coordinates = getCoordinates(point);
+        const isSelected = point.source_index === selectedPoint.source_index;
+        context.fillStyle = transitionColors[point.state_delta.change_type] || "#858b91";
+        context.globalAlpha = point.is_highlighted ? 1 : .72;
+        context.beginPath(); context.arc(scaleX(coordinates.x), scaleY(coordinates.y), point.is_highlighted ? 4.6 : 3.1, 0, Math.PI * 2); context.fill();
+        if (random || isSelected) { context.globalAlpha = 1; context.strokeStyle = "#fff"; context.lineWidth = isSelected ? 2 : 1.1; context.beginPath(); context.arc(scaleX(coordinates.x), scaleY(coordinates.y), isSelected ? 8 : point.is_highlighted ? 7 : 5.2, 0, Math.PI * 2); context.stroke(); }
+      });
+      context.globalAlpha = 1;
+      context.fillStyle = "#f2f2f2";
+      context.font = "600 13px system-ui, sans-serif";
+      context.textAlign = "center";
+      context.fillText("PC1", baseWidth / 2, baseHeight - 12);
+      context.save(); context.translate(17, baseHeight / 2); context.rotate(-Math.PI / 2); context.fillText("PC2", 0, 0); context.restore();
+    };
+    draw();
+    const observer = new ResizeObserver(draw);
+    observer.observe(canvas);
+    return () => observer.disconnect();
+  }, [isReconstruction, isTransitionSpace, points, selectedSourceIndex]);
+
+  const samples = points?.filter((point) => point.is_highlighted).sort((a, b) => a.reconstruction_sample_id.localeCompare(b.reconstruction_sample_id)) || [];
+  const selectedPoint = points?.find((point) => point.source_index === selectedSourceIndex) || points?.[0];
+  const selectedStateSnapshot = selectedPoint && stateSnapshots?.find((snapshot) => snapshot.sampleId === selectedPoint.reconstruction_sample_id);
+  const selectedSummary = selectedPoint ? `${humanizeTransition(selectedPoint.state_delta.change_type)} · ${selectedPoint.action.label}` : "";
+
+  const selectNearestPoint = (event) => {
+    if (!points || isReconstruction) return;
+    const canvas = canvasRef.current;
+    const bounds = canvas.getBoundingClientRect();
+    const x = ((event.clientX - bounds.left) / bounds.width) * 760;
+    const y = ((event.clientY - bounds.top) / bounds.height) * 390;
+    const getCoordinates = (point) => isTransitionSpace ? point.coordinates.prior : point;
+    const xs = points.map((point) => getCoordinates(point).x);
+    const ys = points.map((point) => getCoordinates(point).y);
+    const minX = Math.min(...xs); const maxX = Math.max(...xs);
+    const minY = Math.min(...ys); const maxY = Math.max(...ys);
+    const scaleX = (value) => 58 + ((value - minX) / (maxX - minX)) * 674;
+    const scaleY = (value) => 342 - ((value - minY) / (maxY - minY)) * 318;
+    const nearest = points.map((point) => ({ point, distance: Math.hypot(scaleX(getCoordinates(point).x) - x, scaleY(getCoordinates(point).y) - y) })).sort((a, b) => a.distance - b.distance)[0];
+    if (nearest?.distance <= 14) setSelectedSourceIndex(nearest.point.source_index);
+  };
+
+  if (loadError) return <div className="section-media__placeholder">Unable to load the packaged synthesis snapshot.</div>;
+  return <>
+    {isReconstruction ? <div className="synthesis-sample-selector" role="group" aria-label="Choose a highlighted reconstruction sample">
+      {samples.map((sample) => <button type="button" aria-label={`Inspect reconstruction sample ${sample.reconstruction_sample_id}`} key={sample.source_index} className={sample.source_index === selectedSourceIndex ? "is-selected" : ""} onClick={() => setSelectedSourceIndex(sample.source_index)}>{sample.reconstruction_sample_id}</button>)}
+    </div> : null}
+    <canvas className={`synthesis-canvas${isReconstruction ? "" : " is-selectable"}`} ref={canvasRef} onClick={selectNearestPoint} aria-label={isReconstruction ? "Selected highlighted reconstruction sample from step 148000" : `All 1000 ${view} PCA points from step 148000. Click a point to inspect it.`} />
+    {selectedPoint ? <div className="synthesis-selection">
+      <strong>{isReconstruction ? `#${selectedPoint.reconstruction_sample_id}` : "Selected point"}</strong>
+      <span>{selectedSummary}</span>
+      {!isReconstruction ? <>
+        <p>{selectedPoint.card_used.description}</p>
+        <small>{selectedPoint.card_used.type} · {(selectedPoint.card_used.colors || []).join("") || "colourless"} · observed delta: {humanizeTransition(selectedPoint.state_delta.change_type)}</small>
+      </> : null}
+    </div> : null}
+    {isReconstruction && selectedStateSnapshot ? <div className="reconstruction-state-comparison" aria-label="Current, predicted, and true next game states">
+      {selectedStateSnapshot.states.map((state) => <ReconstructionStatePanel key={state.title} state={state} />)}
+    </div> : null}
+  </>;
+}
+
 function ProjectSectionMediaItem({ item, ui }) {
   const [hasMediaError, setHasMediaError] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -337,12 +552,18 @@ function ProjectSectionMediaItem({ item, ui }) {
   const mediaSrc = item.src ? assetUrl(item.src) : "";
   const posterSrc = item.poster ? assetUrl(item.poster) : "";
   const isImage = item.kind === "image" || item.type?.startsWith("image/");
+  const isEmbed = item.kind === "embed";
+  const isSynthesisCanvas = item.kind === "synthesis-canvas";
   const shouldRenderMedia = mediaSrc && !hasMediaError;
 
   return (
     <figure className="section-media">
-      <div className={`section-media__frame${isImage ? "" : " section-media__frame--video"}`}>
-        {shouldRenderMedia && isImage ? (
+      <div className={`section-media__frame${isImage ? "" : isEmbed ? " section-media__frame--embed" : isSynthesisCanvas ? " section-media__frame--canvas" : " section-media__frame--video"}`}>
+        {isSynthesisCanvas ? (
+          <SynthesisCanvas view={item.view} />
+        ) : shouldRenderMedia && isEmbed ? (
+          <iframe src={mediaSrc} title={item.title} loading="lazy" onError={() => setHasMediaError(true)} />
+        ) : shouldRenderMedia && isImage ? (
           <img src={mediaSrc} alt={item.alt || item.title} loading="lazy" onError={() => setHasMediaError(true)} />
         ) : shouldRenderMedia ? (
           <video
@@ -362,7 +583,7 @@ function ProjectSectionMediaItem({ item, ui }) {
         ) : (
           <div className="section-media__placeholder">{ui.videoUnavailable}</div>
         )}
-        {shouldRenderMedia && !isImage && !isPlaying ? (
+        {shouldRenderMedia && !isImage && !isEmbed && !isSynthesisCanvas && !isPlaying ? (
           <button type="button" className="section-media__play" aria-label={`${ui.playVideo}: ${item.title}`} onClick={() => void videoRef.current?.play()}>
             <span aria-hidden="true">▶</span>
             <span>{ui.playVideo}</span>
@@ -378,8 +599,9 @@ function ProjectSectionMediaItem({ item, ui }) {
 }
 
 function ProjectSectionMedia({ items, ui }) {
+  const isSynthesisGroup = items.length > 1 && items.every((item) => item.kind === "synthesis-canvas");
   return (
-    <div className="section-media-list">
+    <div className={`section-media-list${isSynthesisGroup ? " section-media-list--synthesis" : ""}`}>
       {items.map((item) => <ProjectSectionMediaItem item={item} key={item.id} ui={ui} />)}
     </div>
   );

@@ -72,6 +72,7 @@ export const projects = [
     status: "Stage 1 implemented · Stage 2 proposed",
     mediaLabel: "Generalizable Card Game AI",
     mediaDetail: "Stage 1 architecture · four major model iterations",
+    inlineMedia: true,
     thumbnail: {
       src: "images/project-thumbnails/GeneralizableCardGameAI.png",
       alt: "Research cover for Generalizable Card Game AI, showing an action-vector pretraining stage and a planned large-action-space SAC stage."
@@ -84,20 +85,6 @@ export const projects = [
       { label: "Reference · arXiv:2206.12700", href: "https://arxiv.org/abs/2206.12700" },
       { label: "Large Discrete Actions · arXiv:1512.07679", href: "https://arxiv.org/abs/1512.07679" }
     ],
-    mediaGallery: {
-      title: "Stage 1 Architecture & Research Plan",
-      intro: "The final implemented Stage 1 model is shown alongside the broader two-stage research direction.",
-      items: [
-        {
-          id: "generalizable-card-game-ai-stage-1-architecture",
-          title: "Final Stage 1 State-Transition Architecture",
-          description: "The final plan-conditioned CVAE architecture: shared feature encoders, entity-aware transition encoding, four plan tokens, and structured existing-entity / birth-entity decoding.",
-          src: "images/generalizable-card-game-ai/end-to-end-game-state-transition.svg",
-          alt: "End-to-end structured game-state transition model architecture for the final Stage 1 card-game AI.",
-          kind: "image"
-        }
-      ]
-    },
     sections: [
       {
         title: "Research Goal",
@@ -127,13 +114,64 @@ export const projects = [
           "TransitionPlanner produces four interpretable plan tokens before decoding the next state.",
           "Prior and posterior encoders learn latent transition paths for inference and training respectively.",
           "The decoder predicts global-state changes, existing-entity destinations and attributes, and up to ten source-unknown birth entities."
-        ]
+        ],
+        media: [{
+          id: "generalizable-card-game-ai-stage-1-architecture",
+          title: "Final Stage 1 State-Transition Architecture",
+          description: "The final plan-conditioned CVAE architecture: shared feature encoders, entity-aware transition encoding, four plan tokens, and structured existing-entity / birth-entity decoding.",
+          src: "images/generalizable-card-game-ai/end-to-end-game-state-transition.svg",
+          alt: "End-to-end structured game-state transition model architecture for the final Stage 1 card-game AI.",
+          kind: "image"
+        }]
       },
       {
         title: "Structured Synthesis and Entity Birth",
         paragraphs: [
           "Here, synthesis means reconstructing, predicting, and visualising structured game-state transitions—not image generation. The model predicts where existing cards move, how their attributes change, and whether an action introduces previously unseen entities such as summons or resolving spells.",
           "For source-unknown entities, ten birth queries predict existence, destination zone, type, cost, combat statistics, and battle state. Hungarian matching aligns predicted birth slots with the entities observed in the target state without requiring a specific card ID to be generated directly."
+        ]
+      },
+      {
+        title: "Training-Score Trajectory",
+        paragraphs: [
+          "The original TensorBoard comparison of the four reconstruction/score runs. This is a training-history screenshot, not a held-out evaluation."
+        ],
+        media: [{
+          id: "generalizable-card-game-ai-reconstruction-score",
+          title: "reconstruction/score Across the Four Major Versions",
+          description: "Original TensorBoard capture. The planned entity-birth model is shown in pink; higher is better: reconstruction/score = 1 / (1 + reconstruction loss).",
+          src: "images/generalizable-card-game-ai/reconstruction-score-tensorboard.png",
+          alt: "TensorBoard reconstruction score comparison across four major card-game AI versions.",
+          kind: "image"
+        }]
+      },
+      {
+        title: "Synthesis Visualisations",
+        paragraphs: [
+          "These interactive diagnostic views use the same 1,000 samples from specific_entity_birth_plan_zero_message_v01 at step 148,000. Read them in order: Reconstruction compares current state → Prior-predicted next state → true next state; Transition Plan asks how the action intends to change the state; Transition Space asks what next-state outcome structure the Prior considers plausible. The two PCA projections are computed independently, so their coordinates are not directly comparable. They are diagnostic evidence, not held-out evaluation."
+        ],
+        media: [
+          {
+            id: "generalizable-card-game-ai-reconstruction-viewer",
+            title: "Reconstruction",
+            description: "Select any of the 20 highlighted samples to compare the exact viewer export: current state → Prior-predicted next state → true next state. Each state panel keeps every zone and entity available in its own scrollable view, alongside the action, full card effect and reconstruction score.",
+            kind: "synthesis-canvas",
+            view: "reconstruction"
+          },
+          {
+            id: "generalizable-card-game-ai-transition-plan-viewer",
+            title: "Transition Plan",
+            description: "All 1,000 deterministic 4-token plan vectors (mean-pooled before PCA). This is the model's explicit intermediate plan—how it interprets the action and card effect before decoding a next state. Removal, graveyard operations and different summon / discard mechanisms separate because they imply different transition paths. Click a point to inspect its action, full card description and observed transition.",
+            kind: "synthesis-canvas",
+            view: "transition-plan"
+          },
+          {
+            id: "generalizable-card-game-ai-transition-space-viewer",
+            title: "Transition Space",
+            description: "All 1,000 Prior-inference transition vectors. This is the model's possible-outcome representation before seeing the true next state. The central overlap is expected because several effects share similar end-state outcomes; combat damage and random / search-based entity generation remain broader because their result is uncertain. Click a point to inspect its action, full card description and observed transition.",
+            kind: "synthesis-canvas",
+            view: "transition-space"
+          }
         ]
       },
       {
@@ -157,18 +195,6 @@ export const projects = [
           "Data source: /mnt/data/trainData/checkpoints/logs; metric tag: reconstruction/score.",
           "The baseline and entity-birth architectures do not contain identical reconstruction-loss terms. Cross-architecture gains are therefore training-log observations, not a same-test-set benchmark.",
           "The birth_v01 → birth_v02 → plan_v01 sequence is the most directly comparable evidence of continuous architectural improvement."
-        ]
-      },
-      {
-        title: "CV-Ready Summary",
-        paragraphs: [
-          "A concise, evidence-aware version for a CV or project summary:"
-        ],
-        bullets: [
-          "Built an action-conditioned CVAE–Transformer model for structured card-game state transitions from global state, card text and attributes, and 362 action types; evolved it through four major architecture iterations.",
-          "Introduced entity-level alignment, ten birth slots, Hungarian matching, Residual CardFusion, and a four-token TransitionPlanner to model cross-zone movement, source-unknown entities, and explicit transition structure.",
-          "Raised the best stable 20-record reconstruction score from 0.2502 to 0.8717 in training logs; comparable birth-model iterations improved from 0.6179 to 0.8717.",
-          "Designed, but have not yet implemented, a second-stage large-action-space SAC policy that will use the learned action representations for generalizable card-game play."
         ]
       },
       {
@@ -964,17 +990,6 @@ const chineseProjectText = [
     summary: "一个两阶段研究框架，目标是让卡牌游戏智能体能够理解多样的卡牌，而不是绑定在固定的卡牌集合上。",
     description: "第一阶段是历经四次重大架构迭代的、由动作条件控制的状态转移模型；第二阶段的大型动作空间 SAC 策略仍处于研究设计阶段。",
     linkLabels: ["Entropy 24(10), 1441", "参考文献 · arXiv:2206.12700", "大型离散动作 · arXiv:1512.07679"],
-    mediaGallery: {
-      title: "第一阶段架构与研究计划",
-      intro: "展示最终实现的第一阶段模型架构，以及整体两阶段研究方向。",
-      items: [
-        {
-          title: "最终第一阶段状态转移架构",
-          description: "最终的 plan-conditioned CVAE 架构：共享特征编码器、实体级转移编码、4 个 plan token，以及结构化的已有实体／新实体解码。",
-          alt: "Generalizable Card Game AI 最终第一阶段的端到端结构化游戏状态转移模型架构。"
-        }
-      ]
-    },
     sections: [
       {
         title: "研究目标",
@@ -1002,13 +1017,60 @@ const chineseProjectText = [
           "TransitionPlanner 在解码下一状态前生成四个可解释的 plan token。",
           "Prior 与 Posterior encoder 分别学习推理和训练时的潜在状态转移路径。",
           "Decoder 预测全局状态变化、原有实体的去向与属性，以及最多十个来源未知的 birth entities。"
-        ]
+        ],
+        media: [{
+          id: "generalizable-card-game-ai-stage-1-architecture",
+          title: "最终第一阶段状态转移架构",
+          description: "最终的 plan-conditioned CVAE 架构：共享特征编码器、实体级转移编码、4 个 plan token，以及结构化的已有实体／新实体解码。",
+          src: "images/generalizable-card-game-ai/end-to-end-game-state-transition.svg",
+          alt: "Generalizable Card Game AI 最终第一阶段的端到端结构化游戏状态转移模型架构。",
+          kind: "image"
+        }]
       },
       {
         title: "结构化 Synthesis 与新实体生成",
         paragraphs: [
           "这里的 synthesis 指结构化游戏状态转移的重构、预测和可视化，并非图像生成。模型预测已有卡牌如何移动、属性如何变化，以及行动是否产生召唤物或结算法术等新的实体。",
           "针对来源未知的新实体，十个 birth query 预测其存在性、目标区域、类型、费用、战斗数值和战斗状态。Hungarian matching 将预测的 birth slot 与目标状态中观察到的实体对齐，而不需要直接生成具体卡牌 ID。"
+        ]
+      },
+      {
+        title: "训练分数轨迹",
+        paragraphs: ["四个 reconstruction/score run 的原始 TensorBoard 对比截图。这是训练历史，不是 held-out evaluation。"],
+        media: [{
+          id: "generalizable-card-game-ai-reconstruction-score",
+          title: "四次重大版本的 reconstruction/score",
+          description: "原始 TensorBoard 截图：带 TransitionPlanner 的实体 birth 模型为粉色。数值越高越好：reconstruction/score = 1 / (1 + reconstruction loss)。",
+          src: "images/generalizable-card-game-ai/reconstruction-score-tensorboard.png",
+          alt: "四个主要版本的 TensorBoard reconstruction score 对比。",
+          kind: "image"
+        }]
+      },
+      {
+        title: "Synthesis 可视化",
+        paragraphs: ["下列交互式诊断图来自 specific_entity_birth_plan_zero_message_v01 的 step 148,000，使用同一批完整的 1,000 个样本。建议按顺序阅读：Reconstruction 对比 Current state → Prior-predicted next state → True next state；Transition Plan 回答“这个动作打算如何改变状态”；Transition Space 回答“在未看到真实下一状态时，Prior 认为结果可能落在哪些结构中”。两张 PCA 图是分别计算的，坐标不能直接比较；它们是诊断证据，而非 held-out evaluation。"],
+        media: [
+          {
+            id: "generalizable-card-game-ai-reconstruction-viewer",
+            title: "Reconstruction",
+            description: "从 20 个 highlighted 样本中选择一个，即可对比从 viewer 精确导出的 Current state → Prior-predicted next state → True next state。每个状态面板都保留全部区域和实体，并可独立滚动查看；同时展示动作、完整卡牌效果和 reconstruction score。",
+            kind: "synthesis-canvas",
+            view: "reconstruction"
+          },
+          {
+            id: "generalizable-card-game-ai-transition-plan-viewer",
+            title: "Transition Plan",
+            description: "包含全部 1,000 个确定性的 4-token transition-plan vector（PCA 前先对 token 求均值）。这是模型在解码下一状态前显式生成的中间计划：它如何理解这次动作和卡牌效果将怎样改变状态。Remove、墓地操作及不同 Summon／Discard 机制更容易分离，因为它们对应不同的状态转移路径。点击任意点可查看动作、完整卡牌描述和观察到的状态转移。",
+            kind: "synthesis-canvas",
+            view: "transition-plan"
+          },
+          {
+            id: "generalizable-card-game-ai-transition-space-viewer",
+            title: "Transition Space",
+            description: "包含全部 1,000 个 Prior-inference transition vector。这是模型在未见真实下一状态时，对可能结果的表示。中心重叠是预期现象：多个效果会产生相似的最终状态；战斗伤害、随机／检索式实体生成因结果尚不确定而保留更宽的分布。点击任意点可查看动作、完整卡牌描述和观察到的状态转移。",
+            kind: "synthesis-canvas",
+            view: "transition-space"
+          }
         ]
       },
       {
@@ -1028,16 +1090,6 @@ const chineseProjectText = [
           "数据来源：/mnt/data/trainData/checkpoints/logs；指标标签：reconstruction/score。",
           "基线与实体 birth 架构所含的 reconstruction loss 项不完全一致，因此跨架构提升应理解为训练日志中的观测结果，而非同一测试集 benchmark。",
           "birth_v01 → birth_v02 → plan_v01 的连续迭代使用更相近的目标，因此是更直接的架构改进依据。"
-        ]
-      },
-      {
-        title: "简历精简版",
-        paragraphs: ["适合简历或项目摘要的、包含证据边界的精简表述："],
-        bullets: [
-          "构建由动作条件控制的 CVAE–Transformer 卡牌游戏状态转移模型，输入全局状态、卡牌文本和结构化属性，以及 362 类动作；完成四次重大架构迭代。",
-          "引入实体级对齐、10 个 birth slots、Hungarian matching、Residual CardFusion 和 4-token TransitionPlanner，建模跨区域移动、来源未知新实体和显式状态转移结构。",
-          "训练日志中的最佳稳定 20 条记录 reconstruction score 从 0.2502 提升至 0.8717；可直接比较的 birth 系列从 0.6179 持续提升至 0.8717。",
-          "设计但尚未实现第二阶段的大型动作空间 SAC 策略，计划使用已学习的动作表示实现可泛化的卡牌游戏决策。"
         ]
       },
       {
