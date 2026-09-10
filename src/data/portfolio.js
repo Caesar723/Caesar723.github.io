@@ -530,7 +530,7 @@ export const projects = [
     ],
     mediaGallery: {
       title: "Pipeline Evidence and Results",
-      intro: "The cover image and four project recordings show the aligned rendering labels, 2D fine-tuning comparison, image-aware 3D reconstruction, and Linux containerised rendering service.",
+      intro: "The cover image, 2D-to-3D architecture, and four project recordings show the aligned rendering labels, 2D fine-tuning comparison, image-aware 3D reconstruction, and Linux containerised rendering service.",
       items: [
         {
           id: "video-based-3d-pose-cover",
@@ -538,6 +538,14 @@ export const projects = [
           description: "A visual overview of the synthetic-data, 2D keypoint, and 3D reconstruction workflow.",
           src: "images/project-thumbnails/finetune-2d-point-detection.png",
           alt: "Visual overview of the video-based 3D human pose estimation pipeline.",
+          kind: "image"
+        },
+        {
+          id: "newlifting-2d-to-3d-architecture",
+          title: "NewLifting 2D-to-3D Architecture",
+          description: "The image-aware pose-lifting architecture, showing 2D joint tokens, HMR2 image features, cross-attention, spatial and temporal transformers, and 3D pose output.",
+          src: "images/video-based-3d-human-pose-estimation/newlifting-pose-lifting-architecture.svg",
+          alt: "NewLifting image-aware architecture for reconstructing 3D human pose from video-based 2D keypoints and image features.",
           kind: "image"
         },
         {
@@ -635,14 +643,24 @@ export const projects = [
           "Output: one 3D coordinate for every corresponding input joint.",
           "Used a simplified Gravity View training formulation: the camera is treated as fixed, with only pitch and tilt predicted to decouple the view and learn a stable 3D body structure."
         ],
-        media: [{
-          id: "image-aware-3d-pose-reconstruction",
-          title: "Image-aware 2D-to-3D Pose Reconstruction",
-          description: "A 3D pose prediction produced by the model trained from scratch with both 2D joints and image features.",
-          src: "videos/video-based-3d-human-pose-estimation/image-aware-3d-pose-reconstruction.mp4",
-          poster: "videos/video-based-3d-human-pose-estimation/image-aware-3d-pose-reconstruction.jpg",
-          type: "video/mp4"
-        }]
+        media: [
+          {
+            id: "newlifting-2d-to-3d-architecture",
+            title: "NewLifting 2D-to-3D Architecture",
+            description: "The image-aware pose-lifting architecture, showing 2D joint tokens, HMR2 image features, cross-attention, spatial and temporal transformers, and 3D pose output.",
+            src: "images/video-based-3d-human-pose-estimation/newlifting-pose-lifting-architecture.svg",
+            alt: "NewLifting image-aware architecture for reconstructing 3D human pose from video-based 2D keypoints and image features.",
+            kind: "image"
+          },
+          {
+            id: "image-aware-3d-pose-reconstruction",
+            title: "Image-aware 2D-to-3D Pose Reconstruction",
+            description: "A 3D pose prediction produced by the model trained from scratch with both 2D joints and image features.",
+            src: "videos/video-based-3d-human-pose-estimation/image-aware-3d-pose-reconstruction.mp4",
+            poster: "videos/video-based-3d-human-pose-estimation/image-aware-3d-pose-reconstruction.jpg",
+            type: "video/mp4"
+          }
+        ]
       },
       {
         title: "Linux Containerised Unreal Engine Rendering",
@@ -1386,12 +1404,17 @@ const chineseProjectText = [
     linkLabels: ["XRFeitoria", "MixSTE"],
     mediaGallery: {
       title: "流程证据与结果展示",
-      intro: "封面图与四段项目录像依次展示对齐后的渲染标注、2D 微调对比、图像增强的 3D 重建，以及 Linux 容器化渲染服务。",
+      intro: "封面图、2D 到 3D 架构图与四段项目录像依次展示对齐后的渲染标注、2D 微调对比、图像增强的 3D 重建，以及 Linux 容器化渲染服务。",
       items: [
         {
           title: "两阶段流程",
           description: "合成数据、2D 关键点和 3D 重建工作流的视觉概览。",
           alt: "基于视频的 3D 人体姿态估计流程概览。"
+        },
+        {
+          title: "NewLifting 2D 到 3D 架构图",
+          description: "图像增强的姿态提升架构，展示 2D 关节 token、HMR2 图像特征、交叉注意力、空间与时间 Transformer，以及 3D 姿态输出。",
+          alt: "NewLifting 图像增强架构：由视频 2D 关键点和图像特征重建 3D 人体姿态。"
         },
         {
           title: "对齐后的渲染 2D 关键点",
@@ -1472,14 +1495,24 @@ const chineseProjectText = [
           "输出：每个输入骨骼点对应一个 3D 坐标。",
           "训练采用简化的 Gravity View：假设相机固定，仅输出俯仰角和倾斜角以解耦视角，重点学习稳定的 3D 人体结构。"
         ],
-        media: [{
-          id: "image-aware-3d-pose-reconstruction",
-          title: "图像增强的 2D 到 3D 姿态重建",
-          description: "使用 2D 骨骼点和图像特征、从头训练的 3D 姿态预测结果。",
-          src: "videos/video-based-3d-human-pose-estimation/image-aware-3d-pose-reconstruction.mp4",
-          poster: "videos/video-based-3d-human-pose-estimation/image-aware-3d-pose-reconstruction.jpg",
-          type: "video/mp4"
-        }]
+        media: [
+          {
+            id: "newlifting-2d-to-3d-architecture",
+            title: "NewLifting 2D 到 3D 架构图",
+            description: "图像增强的姿态提升架构，展示 2D 关节 token、HMR2 图像特征、交叉注意力、空间与时间 Transformer，以及 3D 姿态输出。",
+            src: "images/video-based-3d-human-pose-estimation/newlifting-pose-lifting-architecture.svg",
+            alt: "NewLifting 图像增强架构：由视频 2D 关键点和图像特征重建 3D 人体姿态。",
+            kind: "image"
+          },
+          {
+            id: "image-aware-3d-pose-reconstruction",
+            title: "图像增强的 2D 到 3D 姿态重建",
+            description: "使用 2D 骨骼点和图像特征、从头训练的 3D 姿态预测结果。",
+            src: "videos/video-based-3d-human-pose-estimation/image-aware-3d-pose-reconstruction.mp4",
+            poster: "videos/video-based-3d-human-pose-estimation/image-aware-3d-pose-reconstruction.jpg",
+            type: "video/mp4"
+          }
+        ]
       },
       {
         title: "Linux 容器化 Unreal Engine 渲染",
