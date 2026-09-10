@@ -71,14 +71,14 @@ export const projects = [
     role: "Research Engineer · Personal Project",
     status: "Stage 1 implemented · Stage 2 proposed",
     mediaLabel: "Generalizable Card Game AI",
-    mediaDetail: "Stage 1 architecture · four major model iterations",
+    mediaDetail: "Stage 1 architecture · six major model iterations",
     inlineMedia: true,
     thumbnail: {
       src: "images/project-thumbnails/GeneralizableCardGameAI.png",
       alt: "Research cover for Generalizable Card Game AI, showing an action-vector pretraining stage and a planned large-action-space SAC stage."
     },
     summary: "A two-stage research framework for a card-game agent that can reason about diverse cards rather than being tied to a fixed card catalogue.",
-    description: "Stage 1 is an action-conditioned state-transition model developed through four major architecture iterations. The Stage 2 large-action-space SAC policy remains a research proposal.",
+    description: "Stage 1 is an action-conditioned state-transition model developed through six major representation and architecture iterations. The Stage 2 large-action-space SAC policy remains a research proposal.",
     technologies: ["Python", "PyTorch", "CVAE", "Transformer", "Action Embeddings", "Hungarian Matching", "SAC (planned)"],
     links: [
       { label: "Game Environment · GitHub", href: "https://github.com/Caesar723/Magic" },
@@ -115,9 +115,10 @@ export const projects = [
           "Jina text embeddings encode card descriptions, while CardStateEncoder represents structured attributes such as type, mana cost, colour identity, keywords, combat values, tapped state, and base creature statistics. Residual CardFusion combines these signals, EntityStateTransformerEncoder models entities jointly across zones, and a TransitionPlanner exposes intermediate transition structure before decoding."
         ],
         bullets: [
-          "TransitionPlanner produces four interpretable plan tokens before decoding the next state.",
+          "TransitionPlanner produces four learned plan tokens before decoding the next state; they are trained indirectly through reconstruction loss rather than labelled as symbolic destroy, discard, or summon plans.",
           "Prior and posterior encoders learn latent transition paths for inference and training respectively.",
-          "The decoder predicts global-state changes, existing-entity destinations and attributes, and up to ten source-unknown birth entities."
+          "The decoder predicts global-state changes, existing-entity destinations and attributes, and up to ten source-unknown birth entities.",
+          "The merge version realigns disappear/reappear cases with matching static card identity, reducing false birth targets caused by entity-ID mismatch."
         ],
         media: [{
           id: "generalizable-card-game-ai-stage-1-architecture",
@@ -133,36 +134,38 @@ export const projects = [
         title: "Structured Synthesis and Entity Birth",
         paragraphs: [
           "Here, synthesis means reconstructing, predicting, and visualising structured game-state transitions—not image generation. The model predicts where existing cards move, how their attributes change, and whether an action introduces previously unseen entities such as summons or resolving spells.",
-          "For source-unknown entities, ten birth queries predict existence, destination zone, type, cost, combat statistics, and battle state. Hungarian matching aligns predicted birth slots with the entities observed in the target state without requiring a specific card ID to be generated directly."
+          "For source-unknown entities, ten birth queries predict existence, destination zone, type, cost, combat statistics, and battle state. Hungarian matching aligns predicted birth slots with the entities observed in the target state without requiring a specific card ID to be generated directly. Random generation remains intrinsically uncertain: predicting too many entities activates extra birth slots, increases birth loss, and lowers the aggregate score even when the model covers a more complete task."
         ]
       },
       {
         order: 5,
         title: "Training-Score Trajectory",
         paragraphs: [
-          "The original TensorBoard comparison of the four reconstruction/score runs. This is a training-history screenshot, not a held-out evaluation."
+          "The table compares all six versions using only records at step ≤ 170,000. Each best score is a contiguous 20-record mean—about 400 training steps because the logs are sampled roughly every 20 steps. The image below remains the original four-run TensorBoard capture; both are training history, not held-out evaluation."
         ],
         media: [
           {
             id: "generalizable-card-game-ai-training-summary",
             title: "Stable Training Summary",
-            description: "Best contiguous 20-record rolling averages, rather than cherry-picked batches. P90 is calculated over each run's final 100 training records.",
+            description: "Unified comparison at step ≤ 170,000. Best values use contiguous 20-record windows; P90 and threshold rates use each run's final 100 records within that cutoff.",
             kind: "training-stats",
             labels: { version: "Version", best: "Best 20 avg", window: "Training window", peak: "Peak log", p90: "Final-100 P90", latest: "Latest plan_v01", high90: "≥ 0.9", high80: "≥ 0.8" },
             stats: [
-              { version: "specific_v01", best: "0.2502", window: "100800–101180", peak: "0.3555", p90: "0.2850" },
-              { version: "entity_birth_v01", best: "0.6179", window: "166340–166720", peak: "0.8894", p90: "0.7268" },
-              { version: "entity_birth_v02", best: "0.6992", window: "123420–123800", peak: "0.9081", p90: "0.7725" },
-              { version: "birth_plan_v01", best: "0.8717", window: "168400–168780", peak: "0.9786", p90: "0.9250" }
+              { version: "specific_v01", best: "0.2750", window: "161660–162040", peak: "0.4562", p90: "0.3113", high90: "0%", high80: "0%" },
+              { version: "specific_entity_v01", best: "0.7668", window: "169240–169620", peak: "0.9148", p90: "0.8306", high90: "1%", high80: "21%" },
+              { version: "specific_entity_birth_v01", best: "0.5955", window: "158140–158520", peak: "0.8416", p90: "0.6654", high90: "0%", high80: "0%" },
+              { version: "specific_entity_birth_v03", best: "0.7389", window: "155800–156180", peak: "0.9314", p90: "0.7385", high90: "0%", high80: "5%" },
+              { version: "specific_entity_birth_plan_wolpertinger_v01", best: "0.8484", window: "152880–153260", peak: "0.9712", p90: "0.8956", high90: "7%", high80: "32%" },
+              { version: "specific_entity_birth_plan_wolpertinger_merge_v01", best: "0.8793", window: "164580–164960", peak: "0.9755", p90: "0.9020", high90: "11%", high80: "33%", highlight: true }
             ],
             latest: { best: "0.8717", p90: "0.9250", peak: "0.9786", high90: "20%", high80: "42%" }
           },
           {
             id: "generalizable-card-game-ai-reconstruction-score",
-            title: "reconstruction/score Across the Four Major Versions",
-            description: "Original TensorBoard capture. The planned entity-birth model is shown in pink; higher is better: reconstruction/score = 1 / (1 + reconstruction loss).",
+            title: "Original Four-Run reconstruction/score Capture",
+            description: "Historical TensorBoard capture retained from the earlier four-run comparison. The plan-conditioned entity-birth model is shown in pink; higher is better: reconstruction/score = 1 / (1 + reconstruction loss).",
             src: "images/generalizable-card-game-ai/reconstruction-score-tensorboard.png",
-            alt: "TensorBoard reconstruction score comparison across four major card-game AI versions.",
+            alt: "Historical TensorBoard reconstruction score comparison across four card-game AI runs.",
             kind: "image"
           }
         ]
@@ -199,27 +202,30 @@ export const projects = [
       },
       {
         order: 4,
-        title: "Four Major Architecture Iterations",
+        title: "Six Representation and Architecture Iterations",
         paragraphs: [
-          "The model evolved through four major versions, each addressing a limitation exposed by the previous transition representation. The score below is reconstruction/score = 1 / (1 + reconstruction loss); higher is better."
+          "The model evolved from fixed-slot reconstruction to entity-aligned transition prediction, entity birth, learned transition planning, and corrected identity matching. The scores below use the unified step ≤ 170,000 comparison; reconstruction/score = 1 / (1 + reconstruction loss), so higher is better."
         ],
         bullets: [
-          "specific_v01 — Established the CVAE baseline for global state and fixed-slot multi-zone reconstruction. It lacked explicit source-entity alignment and could not represent source-unknown new entities. Best stable 20-record score: 0.2502.",
-          "specific_entity_birth_v01 — Added EntityStateTransformer, existing-entity alignment, ten birth slots, and Hungarian matching. This made cross-zone movement and source-unknown entity generation explicit. Best stable score: 0.6179 (+147.0% vs. baseline).",
-          "specific_entity_birth_v02 — Added Residual CardFusion and deepened the birth decoder from two to five layers to improve card-semantic fusion and new-entity attribute decoding. Best stable score: 0.6992 (+13.2% vs. birth_v01).",
-          "specific_entity_birth_plan_wolpertinger_v01 — Added a four-token TransitionPlanner and plan-conditioned decoder to make action-to-state-change structure explicit, alongside binding augmentation for varied card-effect descriptions. Best stable score: 0.8717 (+24.7% vs. birth_v02; +248.4% observed vs. baseline)."
+          "specific_v01 — Established the CVAE baseline for full next-state reconstruction across fixed zone slots. Because a card could occupy different slots after moving between hand, battlefield, and graveyard, the learning problem also contained slot permutation and entity misalignment. Best 20-record mean: 0.2750.",
+          "specific_entity_v01 — Inspired by stable joint tokens in the earlier 2D-to-3D human-pose project, this version aligned valid source slots with target entities by card ID and changed the target from a complete slot layout to each existing entity's destination and dynamic attributes. This reduced identity ambiguity while retaining fixed tensors. Best mean: 0.7668.",
+          "specific_entity_birth_v01 — Added ten birth queries and Hungarian matching for entities absent from the source state, enabling token creation, summons, and other source-unknown outcomes. Best mean: 0.5955; the lower aggregate score reflects the additional birth-presence and birth-attribute task, especially under random generation.",
+          "specific_entity_birth_v03 — Strengthened the birth model with residual CardFusion, a deeper entity-transition decoder, and binding augmentation, improving the use of card text, structured attributes, and entity state. Best mean: 0.7389.",
+          "specific_entity_birth_plan_wolpertinger_v01 — Added a four-token TransitionPlanner and plan-conditioned decoder. Its intermediate tokens learn action-conditioned transition structure through the final reconstruction objective rather than manual plan labels. Best mean: 0.8484.",
+          "specific_entity_birth_plan_wolpertinger_merge_v01 — Realigned disappearing source cards with newly observed target cards when their name, description, cost, colour, type, and other static attributes match, reducing unnecessary birth targets. Best mean: 0.8793."
         ]
       },
       {
         order: 6,
         title: "Metric Scope",
         paragraphs: [
-          "Each figure is the best contiguous 20-training-record rolling average found in the corresponding training log, rather than a single high-variance batch. It communicates the best sustained reconstruction level reached during training."
+          "The six-version table uses a single cutoff of step ≤ 170,000. Each best figure is the strongest contiguous 20-record rolling average, approximately 400 training steps, rather than a single high-variance batch. The separate latest plan_v01 summary uses the newest plan training stage and must not be read as another row in the cutoff comparison."
         ],
         bullets: [
           "Data source: /mnt/data/trainData/checkpoints/logs; metric tag: reconstruction/score.",
-          "The baseline and entity-birth architectures do not contain identical reconstruction-loss terms. Cross-architecture gains are therefore training-log observations, not a same-test-set benchmark.",
-          "The birth_v01 → birth_v02 → plan_v01 sequence is the most directly comparable evidence of continuous architectural improvement."
+          "The fixed-slot, existing-entity, and entity-birth architectures do not solve identical tasks or contain identical reconstruction-loss terms. Cross-architecture differences are therefore training-log observations, not a same-test-set benchmark.",
+          "specific_entity_v01 can score above early birth models because it neither generates new entities nor pays birth-presence and birth-attribute losses; a lower birth-model score does not by itself imply a regression.",
+          "Latest plan_v01 summary: best 20-record mean 0.8717; final-100 P90 0.9250; peak 0.9786; 20% of final records ≥ 0.9 and 42% ≥ 0.8."
         ]
       },
       {
@@ -1027,12 +1033,12 @@ const chineseProjectText = [
     period: "2026 年 7 月 - 至今",
     role: "研究工程师 · 个人项目",
     status: "第一阶段已实现 · 第二阶段为方案设计",
-    mediaDetail: "第一阶段架构 · 四次重大模型迭代",
+    mediaDetail: "第一阶段架构 · 六次核心模型迭代",
     thumbnail: {
       alt: "Generalizable Card Game AI 研究封面，展示动作向量预训练阶段与规划中的大型动作空间 SAC 阶段。"
     },
     summary: "一个两阶段研究框架，目标是让卡牌游戏智能体能够理解多样的卡牌，而不是绑定在固定的卡牌集合上。",
-    description: "第一阶段是历经四次重大架构迭代的、由动作条件控制的状态转移模型；第二阶段的大型动作空间 SAC 策略仍处于研究设计阶段。",
+    description: "第一阶段是历经六次表征与架构迭代的、由动作条件控制的状态转移模型；第二阶段的大型动作空间 SAC 策略仍处于研究设计阶段。",
     linkLabels: ["游戏环境 · GitHub", "Entropy 24(10), 1441", "参考文献 · arXiv:2206.12700", "大型离散动作 · arXiv:1512.07679"],
     sections: [
       {
@@ -1061,9 +1067,10 @@ const chineseProjectText = [
           "Jina 文本嵌入编码卡牌描述，CardStateEncoder 表示类型、费用、颜色身份、关键词、战斗数值、横置状态和生物基础属性等结构化信息。Residual CardFusion 融合这些信号，EntityStateTransformerEncoder 对各区域实体进行联合建模，TransitionPlanner 在解码前显式暴露中间转移结构。"
         ],
         bullets: [
-          "TransitionPlanner 在解码下一状态前生成四个可解释的 plan token。",
+          "TransitionPlanner 在解码下一状态前生成四个学习得到的 plan token；它们通过 reconstruction loss 间接训练，并不是人工标注的 destroy、discard 或 summon 等符号计划。",
           "Prior 与 Posterior encoder 分别学习推理和训练时的潜在状态转移路径。",
-          "Decoder 预测全局状态变化、原有实体的去向与属性，以及最多十个来源未知的 birth entities。"
+          "Decoder 预测全局状态变化、原有实体的去向与属性，以及最多十个来源未知的 birth entities。",
+          "merge 版本会重新对齐静态卡牌身份相同的消失／重现实体，减少 entity ID mismatch 造成的错误 birth target。"
         ],
         media: [{
           id: "generalizable-card-game-ai-stage-1-architecture",
@@ -1079,34 +1086,36 @@ const chineseProjectText = [
         title: "结构化 Synthesis 与新实体生成",
         paragraphs: [
           "这里的 synthesis 指结构化游戏状态转移的重构、预测和可视化，并非图像生成。模型预测已有卡牌如何移动、属性如何变化，以及行动是否产生召唤物或结算法术等新的实体。",
-          "针对来源未知的新实体，十个 birth query 预测其存在性、目标区域、类型、费用、战斗数值和战斗状态。Hungarian matching 将预测的 birth slot 与目标状态中观察到的实体对齐，而不需要直接生成具体卡牌 ID。"
+          "针对来源未知的新实体，十个 birth query 预测其存在性、目标区域、类型、费用、战斗数值和战斗状态。Hungarian matching 将预测的 birth slot 与目标状态中观察到的实体对齐，而不需要直接生成具体卡牌 ID。随机生成本身仍有不确定性：如果模型激活了过多 birth slot，会增加 birth loss 并压低整体分数，即使它实际承担了更完整的任务。"
         ]
       },
       {
         order: 5,
         title: "训练分数轨迹",
-        paragraphs: ["四个 reconstruction/score run 的原始 TensorBoard 对比截图。这是训练历史，不是 held-out evaluation。"],
+        paragraphs: ["表格将六个版本统一截取至 step ≤ 170,000；每个最佳值取连续 20 条记录的均值。日志约每 20 step 记录一次，因此该窗口约对应 400 个训练 step。下方图片仍保留原先的四个 run TensorBoard 截图；两者都属于训练历史，而非 held-out evaluation。"],
         media: [
           {
             id: "generalizable-card-game-ai-training-summary",
             title: "稳定训练摘要",
-            description: "使用最佳连续 20 条训练记录的滚动平均，不挑选单个最高 batch；P90 取各 run 末期 100 条训练记录计算。",
+            description: "统一使用 step ≤ 170,000 的日志。最佳值取连续 20 条记录窗口；P90 与阈值占比取截止点内末期 100 条记录。",
             kind: "training-stats",
             labels: { version: "版本", best: "最佳连续 20 条均值", window: "对应训练区间", peak: "日志最高值", p90: "末期 100 条 P90", latest: "最新 plan_v01", high90: "≥ 0.9", high80: "≥ 0.8" },
             stats: [
-              { version: "specific_v01", best: "0.2502", window: "100800–101180", peak: "0.3555", p90: "0.2850" },
-              { version: "entity_birth_v01", best: "0.6179", window: "166340–166720", peak: "0.8894", p90: "0.7268" },
-              { version: "entity_birth_v02", best: "0.6992", window: "123420–123800", peak: "0.9081", p90: "0.7725" },
-              { version: "birth_plan_v01", best: "0.8717", window: "168400–168780", peak: "0.9786", p90: "0.9250" }
+              { version: "specific_v01", best: "0.2750", window: "161660–162040", peak: "0.4562", p90: "0.3113", high90: "0%", high80: "0%" },
+              { version: "specific_entity_v01", best: "0.7668", window: "169240–169620", peak: "0.9148", p90: "0.8306", high90: "1%", high80: "21%" },
+              { version: "specific_entity_birth_v01", best: "0.5955", window: "158140–158520", peak: "0.8416", p90: "0.6654", high90: "0%", high80: "0%" },
+              { version: "specific_entity_birth_v03", best: "0.7389", window: "155800–156180", peak: "0.9314", p90: "0.7385", high90: "0%", high80: "5%" },
+              { version: "specific_entity_birth_plan_wolpertinger_v01", best: "0.8484", window: "152880–153260", peak: "0.9712", p90: "0.8956", high90: "7%", high80: "32%" },
+              { version: "specific_entity_birth_plan_wolpertinger_merge_v01", best: "0.8793", window: "164580–164960", peak: "0.9755", p90: "0.9020", high90: "11%", high80: "33%", highlight: true }
             ],
             latest: { best: "0.8717", p90: "0.9250", peak: "0.9786", high90: "20%", high80: "42%" }
           },
           {
             id: "generalizable-card-game-ai-reconstruction-score",
-            title: "四次重大版本的 reconstruction/score",
-            description: "原始 TensorBoard 截图：带 TransitionPlanner 的实体 birth 模型为粉色。数值越高越好：reconstruction/score = 1 / (1 + reconstruction loss)。",
+            title: "原始四个 run 的 reconstruction/score 截图",
+            description: "保留自较早四个 run 对比的历史 TensorBoard 截图；带 TransitionPlanner 的实体 birth 模型为粉色。数值越高越好：reconstruction/score = 1 / (1 + reconstruction loss)。",
             src: "images/generalizable-card-game-ai/reconstruction-score-tensorboard.png",
-            alt: "四个主要版本的 TensorBoard reconstruction score 对比。",
+            alt: "四个卡牌游戏 AI run 的历史 TensorBoard reconstruction score 对比。",
             kind: "image"
           }
         ]
@@ -1141,23 +1150,26 @@ const chineseProjectText = [
       },
       {
         order: 4,
-        title: "四次重大架构迭代",
-        paragraphs: ["模型经历四个主要版本，每次迭代都针对上一版状态转移表示暴露出的限制。下列分数为 reconstruction/score = 1 / (1 + reconstruction loss)，数值越高越好。"],
+        title: "六次表征与架构迭代",
+        paragraphs: ["模型从固定 slot 完整重构，逐步发展到 entity-aligned transition、entity birth、学习式 transition planning 与 identity 校正。下列分数使用统一的 step ≤ 170,000 比较；reconstruction/score = 1 / (1 + reconstruction loss)，数值越高越好。"],
         bullets: [
-          "specific_v01 —— 建立 CVAE 基线，用于全局状态和固定 slot 的多区域重构；缺少源实体显式对齐，且无法表示来源未知的新实体。最佳稳定 20 条记录分数：0.2502。",
-          "specific_entity_birth_v01 —— 引入 EntityStateTransformer、已有实体对齐、10 个 birth slots 与 Hungarian matching，使跨区域移动和来源未知实体生成能够被显式建模。最佳稳定分数：0.6179（相对基线 +147.0%）。",
-          "specific_entity_birth_v02 —— 加入 Residual CardFusion，并将 birth decoder 从 2 层加深至 5 层，增强卡牌语义融合和新实体属性解码。最佳稳定分数：0.6992（相对 birth_v01 +13.2%）。",
-          "specific_entity_birth_plan_wolpertinger_v01 —— 加入 4-token TransitionPlanner 与 plan-conditioned decoder，使动作到状态变化的中间结构可被显式建模；同时通过 binding augmentation 适应不同的卡牌效果描述。最佳稳定分数：0.8717（相对 birth_v02 +24.7%；相对基线观测值 +248.4%）。"
+          "specific_v01 —— 建立 CVAE 基线，直接重构各区域固定 slot 中的完整 next state。卡牌在手牌、战场和墓地之间移动后可能落在不同 slot，因此任务中同时混入了 slot permutation 与 entity misalignment。最佳连续 20 条均值：0.2750。",
+          "specific_entity_v01 —— 受到此前 2D→3D Human Pose Estimation 中稳定 joint token 的启发，通过 card ID 对齐 source slot 与 target entity，并将目标从完整 slot 布局改为每个已有实体的 destination 与动态属性；在保留固定 tensor 的同时降低 identity ambiguity。最佳均值：0.7668。",
+          "specific_entity_birth_v01 —— 加入 10 个 birth query 与 Hungarian matching，表示 source 中不存在的新实体，从而覆盖 token 生成、召唤和其他来源未知的结果。最佳均值：0.5955；分数下降主要来自新增的 birth presence／attribute 任务及随机生成的不确定性。",
+          "specific_entity_birth_v03 —— 在 birth 结构上引入更强的 residual CardFusion、更深的 entity transition decoder 与 binding augmentation，增强卡牌文本、结构化属性和实体状态的融合。最佳均值：0.7389。",
+          "specific_entity_birth_plan_wolpertinger_v01 —— 加入 4-token TransitionPlanner 与 plan-conditioned decoder；中间 token 通过最终 reconstruction objective 学习 action-conditioned transition structure，而非依赖人工 plan 标签。最佳均值：0.8484。",
+          "specific_entity_birth_plan_wolpertinger_merge_v01 —— 当 source 中消失的卡牌与 target 中新增卡牌的名称、描述、费用、颜色、类型等静态属性一致时重新对齐，减少不必要的 birth target。最佳均值：0.8793。"
         ]
       },
       {
         order: 6,
         title: "指标口径与边界",
-        paragraphs: ["每个数字均取对应训练日志中最佳连续 20 条训练记录的滚动平均，而非单个波动较大的 batch；它反映模型在训练中曾达到的最佳稳定重构水平。"],
+        paragraphs: ["六版本表格统一使用 step ≤ 170,000 的日志；每个最佳值取连续 20 条记录的最强滚动平均，约对应 400 个训练 step，而非单个波动较大的 batch。单独展示的最新 plan_v01 摘要来自更新的 plan 训练阶段，不能作为统一截止表中的另一行直接比较。"],
         bullets: [
           "数据来源：/mnt/data/trainData/checkpoints/logs；指标标签：reconstruction/score。",
-          "基线与实体 birth 架构所含的 reconstruction loss 项不完全一致，因此跨架构提升应理解为训练日志中的观测结果，而非同一测试集 benchmark。",
-          "birth_v01 → birth_v02 → plan_v01 的连续迭代使用更相近的目标，因此是更直接的架构改进依据。"
+          "固定 slot、已有实体与 entity birth 架构承担的任务及 reconstruction loss 项并不完全相同，因此跨架构差异应理解为训练日志观测，而非同一测试集 benchmark。",
+          "specific_entity_v01 不生成新实体，也不承担 birth presence／attribute loss，因此高于早期 birth 版本是正常现象；birth 版本分数较低并不等于模型退化。",
+          "最新 plan_v01 摘要：最佳连续 20 条均值 0.8717；末期 100 条 P90 0.9250；日志最高值 0.9786；末期记录中 20% ≥ 0.9、42% ≥ 0.8。"
         ]
       },
       {

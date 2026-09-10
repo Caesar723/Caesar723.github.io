@@ -579,16 +579,20 @@ function TrainingStats({ item }) {
               <th scope="col">{item.labels.window}</th>
               <th scope="col">{item.labels.peak}</th>
               <th scope="col">{item.labels.p90}</th>
+              <th scope="col">{item.labels.high90}</th>
+              <th scope="col">{item.labels.high80}</th>
             </tr>
           </thead>
           <tbody>
             {item.stats.map((stat) => (
-              <tr className={stat.version === "birth_plan_v01" ? "is-latest" : undefined} key={stat.version}>
+              <tr className={stat.highlight ? "is-latest" : undefined} key={stat.version}>
                 <th scope="row">{stat.version}</th>
                 <td>{stat.best}</td>
                 <td>{stat.window}</td>
                 <td>{stat.peak}</td>
                 <td>{stat.p90}</td>
+                <td>{stat.high90}</td>
+                <td>{stat.high80}</td>
               </tr>
             ))}
           </tbody>

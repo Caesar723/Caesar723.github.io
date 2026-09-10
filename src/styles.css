@@ -307,7 +307,7 @@ li + li { margin-top: 5px; }
 .training-stats__highlights dt { color: #aaa; font-size: 10px; line-height: 1.2; }
 .training-stats__highlights dd { margin: 0; color: #fff; font: 650 16px/1.15 ui-monospace, SFMono-Regular, Menlo, monospace; }
 .training-stats__table-wrap { overflow-x: auto; scrollbar-color: #858585 #202020; }
-.training-stats__table { width: 100%; min-width: 660px; border-collapse: collapse; font-size: 12px; }
+.training-stats__table { width: 100%; min-width: 1080px; border-collapse: collapse; font-size: 12px; }
 .training-stats__table th,
 .training-stats__table td { padding: 10px 13px; border-bottom: 1px solid rgba(255,255,255,.1); text-align: right; white-space: nowrap; }
 .training-stats__table thead th { color: #aeaeae; background: #252525; font-size: 10px; font-weight: 650; letter-spacing: .025em; }
