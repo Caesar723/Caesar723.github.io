@@ -530,7 +530,7 @@ function SynthesisCanvas({ view }) {
     {isReconstruction ? <div className="synthesis-sample-selector" role="group" aria-label="Choose a highlighted reconstruction sample">
       {samples.map((sample) => <button type="button" aria-label={`Inspect reconstruction sample ${sample.reconstruction_sample_id}`} key={sample.source_index} className={sample.source_index === selectedSourceIndex ? "is-selected" : ""} onClick={() => setSelectedSourceIndex(sample.source_index)}>{sample.reconstruction_sample_id}</button>)}
     </div> : null}
-    <canvas className={`synthesis-canvas${isReconstruction ? "" : " is-selectable"}`} ref={canvasRef} onClick={selectNearestPoint} aria-label={isReconstruction ? "Selected highlighted reconstruction sample from step 148000" : `All 1000 ${view} PCA points from step 148000. Click a point to inspect it.`} />
+    <canvas className={`synthesis-canvas${isReconstruction ? "" : " is-selectable"}`} ref={canvasRef} onClick={selectNearestPoint} aria-label={isReconstruction ? "Selected highlighted reconstruction sample from support_v04 step 188000" : `All 1000 ${view} PCA points from support_v04 step 188000. Click a point to inspect it.`} />
     {selectedPoint ? <div className="synthesis-selection">
       <strong>{isReconstruction ? `#${selectedPoint.reconstruction_sample_id}` : "Selected point"}</strong>
       <span>{selectedSummary}</span>
@@ -559,7 +559,7 @@ function TrainingStats({ item }) {
       <div className="training-stats__latest">
         <div>
           <span className="training-stats__eyebrow">{item.labels.latest}</span>
-          <strong>reconstruction/score</strong>
+          <strong>posterior reconstruction/score</strong>
         </div>
         <dl className="training-stats__highlights">
           {highlights.map(([label, value]) => (
